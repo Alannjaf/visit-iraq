@@ -1,0 +1,263 @@
+import { notFound } from "next/navigation";
+import Link from "next/link";
+import { getListingById, getUserRole } from "@/lib/db";
+import { Header, Footer } from "@/components/layout";
+import { Button, Badge } from "@/components/ui";
+import { stackServerApp } from "@/stack";
+import { getListingTypeLabel, formatPriceRange, formatDate } from "@/lib/utils";
+import { SafeImage } from "@/components/listings/SafeImage";
+
+export default async function ListingDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+  const user = await stackServerApp.getUser();
+  let userRole = null;
+  if (user) {
+    userRole = await getUserRole(user.id);
+  }
+
+  const listing = await getListingById(id);
+
+  if (!listing || listing.status !== "approved") {
+    notFound();
+  }
+
+  const isAuthenticated = !!user;
+
+  const defaultImages = {
+    accommodation: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&h=600&fit=crop",
+    attraction: "https://images.unsplash.com/photo-1539650116574-8efeb43e2750?w=800&h=600&fit=crop",
+    tour: "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=800&h=600&fit=crop",
+  };
+
+  const mainImage = listing.images?.[0] || defaultImages[listing.type];
+
+  return (
+    <div className="min-h-screen flex flex-col">
+      <Header userRole={userRole} />
+
+      <main className="flex-1 bg-[var(--background)]">
+        {/* Breadcrumb */}
+        <div className="bg-white border-b border-[var(--border)]">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <nav className="flex items-center gap-2 text-sm">
+              <Link href="/" className="text-[var(--foreground-muted)] hover:text-[var(--primary)]">
+                Home
+              </Link>
+              <span className="text-[var(--foreground-muted)]">/</span>
+              <Link href="/listings" className="text-[var(--foreground-muted)] hover:text-[var(--primary)]">
+                Listings
+              </Link>
+              <span className="text-[var(--foreground-muted)]">/</span>
+              <span className="text-[var(--foreground)]">{listing.title}</span>
+            </nav>
+          </div>
+        </div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Main Content */}
+            <div className="lg:col-span-2 space-y-6">
+              {/* Image Gallery */}
+              <div className="bg-white rounded-xl border border-[var(--border)] overflow-hidden">
+                <div className="aspect-video relative">
+                  <SafeImage
+                    src={mainImage}
+                    alt={listing.title}
+                    className="w-full h-full object-cover"
+                    fallbackSrc={defaultImages[listing.type]}
+                  />
+                </div>
+                {listing.images && listing.images.length > 1 && (
+                  <div className="p-4 flex gap-2 overflow-x-auto">
+                    {listing.images.slice(1, 5).map((img, index) => (
+                      <img
+                        key={index}
+                        src={img}
+                        alt={`${listing.title} ${index + 2}`}
+                        className="w-24 h-16 object-cover rounded-lg flex-shrink-0"
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Header Info */}
+              <div className="bg-white rounded-xl border border-[var(--border)] p-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <span className="px-3 py-1 bg-[var(--primary)]/10 rounded-full text-sm font-medium text-[var(--primary)]">
+                    {getListingTypeLabel(listing.type)}
+                  </span>
+                  <Badge variant="approved">Live</Badge>
+                </div>
+                <h1 className="text-3xl font-display font-bold text-[var(--foreground)] mb-4">
+                  {listing.title}
+                </h1>
+                <div className="flex items-center gap-2 text-[var(--foreground-muted)]">
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  <span>{listing.location}, {listing.city}, {listing.region}</span>
+                </div>
+              </div>
+
+              {/* Description */}
+              <div className="bg-white rounded-xl border border-[var(--border)] p-6">
+                <h2 className="text-xl font-bold text-[var(--foreground)] mb-4">About</h2>
+                <p className="text-[var(--foreground)] whitespace-pre-wrap leading-relaxed">
+                  {listing.description}
+                </p>
+              </div>
+
+              {/* Amenities */}
+              {listing.amenities && listing.amenities.length > 0 && (
+                <div className="bg-white rounded-xl border border-[var(--border)] p-6">
+                  <h2 className="text-xl font-bold text-[var(--foreground)] mb-4">
+                    {listing.type === "accommodation" ? "Amenities" : "Features"}
+                  </h2>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                    {listing.amenities.map((amenity, index) => (
+                      <div key={index} className="flex items-center gap-2">
+                        <svg className="w-5 h-5 text-[var(--success)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                        <span className="text-[var(--foreground)]">{amenity}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Sidebar */}
+            <div className="space-y-6">
+              {/* Price & Contact Card */}
+              <div className="bg-white rounded-xl border border-[var(--border)] p-6 sticky top-24">
+                {isAuthenticated ? (
+                  <>
+                    {/* Price */}
+                    <div className="mb-6 pb-6 border-b border-[var(--border)]">
+                      <p className="text-sm text-[var(--foreground-muted)] mb-1">Price Range</p>
+                      <p className="text-2xl font-bold text-[var(--primary)]">
+                        {formatPriceRange(listing.price_range)}
+                      </p>
+                    </div>
+
+                    {/* Contact Info */}
+                    <div className="space-y-4 mb-6">
+                      <h3 className="font-bold text-[var(--foreground)]">Contact Information</h3>
+                      
+                      {listing.contact_phone && (
+                        <a
+                          href={`tel:${listing.contact_phone}`}
+                          className="flex items-center gap-3 p-3 bg-[var(--background-alt)] rounded-lg hover:bg-[var(--border)] transition-colors"
+                        >
+                          <svg className="w-5 h-5 text-[var(--primary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                          </svg>
+                          <span className="text-[var(--foreground)]">{listing.contact_phone}</span>
+                        </a>
+                      )}
+
+                      {listing.contact_email && (
+                        <a
+                          href={`mailto:${listing.contact_email}`}
+                          className="flex items-center gap-3 p-3 bg-[var(--background-alt)] rounded-lg hover:bg-[var(--border)] transition-colors"
+                        >
+                          <svg className="w-5 h-5 text-[var(--primary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                          </svg>
+                          <span className="text-[var(--foreground)]">{listing.contact_email}</span>
+                        </a>
+                      )}
+
+                      {listing.full_address && (
+                        <div className="flex items-start gap-3 p-3 bg-[var(--background-alt)] rounded-lg">
+                          <svg className="w-5 h-5 text-[var(--primary)] flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                          </svg>
+                          <span className="text-[var(--foreground)]">{listing.full_address}</span>
+                        </div>
+                      )}
+                    </div>
+
+                    {listing.external_link && (
+                      <a
+                        href={listing.external_link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <Button variant="primary" className="w-full">
+                          Visit Website
+                          <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                          </svg>
+                        </Button>
+                      </a>
+                    )}
+                  </>
+                ) : (
+                  /* Sign Up CTA for Guests */
+                  <div className="text-center">
+                    <div className="w-16 h-16 rounded-full bg-[var(--primary)]/10 flex items-center justify-center mx-auto mb-4">
+                      <svg className="w-8 h-8 text-[var(--primary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                      </svg>
+                    </div>
+                    <h3 className="font-bold text-[var(--foreground)] mb-2">
+                      Sign Up to See Full Details
+                    </h3>
+                    <p className="text-sm text-[var(--foreground-muted)] mb-6">
+                      Create a free account to view contact information, pricing, and booking options.
+                    </p>
+                    <Link href={`/handler/sign-up?after_auth_return_to=/listings/${id}`}>
+                      <Button variant="primary" className="w-full mb-3">
+                        Sign Up Free
+                      </Button>
+                    </Link>
+                    <Link href={`/handler/sign-in?after_auth_return_to=/listings/${id}`}>
+                      <Button variant="outline" className="w-full">
+                        Already have an account? Sign In
+                      </Button>
+                    </Link>
+                  </div>
+                )}
+              </div>
+
+              {/* Info Card */}
+              <div className="bg-white rounded-xl border border-[var(--border)] p-6">
+                <h3 className="font-bold text-[var(--foreground)] mb-4">Listing Info</h3>
+                <div className="space-y-3 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-[var(--foreground-muted)]">Type</span>
+                    <span className="text-[var(--foreground)]">{getListingTypeLabel(listing.type)}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-[var(--foreground-muted)]">Region</span>
+                    <span className="text-[var(--foreground)]">{listing.region}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-[var(--foreground-muted)]">City</span>
+                    <span className="text-[var(--foreground)]">{listing.city}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-[var(--foreground-muted)]">Listed</span>
+                    <span className="text-[var(--foreground)]">{formatDate(listing.created_at)}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <Footer />
+    </div>
+  );
+}
+
