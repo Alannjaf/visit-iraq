@@ -88,6 +88,16 @@ export default async function AdminListingsPage({
               >
                 Rejected
               </Link>
+              <Link
+                href="/admin/listings?status=delisted"
+                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                  params.status === "delisted"
+                    ? "bg-yellow-500 text-white"
+                    : "bg-[var(--background-alt)] text-[var(--foreground-muted)] hover:bg-[var(--border)]"
+                }`}
+              >
+                Delisted
+              </Link>
             </div>
           </div>
           <div>
@@ -185,7 +195,7 @@ export default async function AdminListingsPage({
                     </span>
                   </td>
                   <td className="px-6 py-4">
-                    <Badge variant={listing.status as "pending" | "approved" | "rejected"}>
+                    <Badge variant={listing.status as "pending" | "approved" | "rejected" | "delisted"}>
                       {listing.status}
                     </Badge>
                   </td>

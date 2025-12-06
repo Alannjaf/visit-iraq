@@ -101,6 +101,30 @@ export default function AdminListingDetailPage({
     }
   };
 
+  const handleDelist = async () => {
+    if (!confirm("Are you sure you want to delist this listing? It will be removed from public view.")) return;
+    setActionLoading(true);
+    try {
+      const res = await fetch(`/api/admin/listings/${id}/delist`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+      });
+      
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({ error: "Unknown error" }));
+        throw new Error(errorData.error || `HTTP ${res.status}: Failed to delist`);
+      }
+      
+      await fetchListing();
+    } catch (error) {
+      console.error("Error delisting:", error);
+      alert(`Error: ${error instanceof Error ? error.message : "Failed to delist listing"}`);
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
   const handleDelete = async () => {
     if (!confirm("Are you sure you want to delete this listing?")) return;
     setActionLoading(true);
@@ -156,7 +180,7 @@ export default function AdminListingDetailPage({
           <div className="flex items-start justify-between">
             <div>
               <div className="flex items-center gap-3 mb-2">
-                <Badge variant={listing.status as "pending" | "approved" | "rejected"}>
+                <Badge variant={listing.status as "pending" | "approved" | "rejected" | "delisted"}>
                   {listing.status}
                 </Badge>
                 <span className="text-sm text-[var(--foreground-muted)]">
@@ -284,6 +308,39 @@ export default function AdminListingDetailPage({
           <div className="p-6 bg-red-50 border-t border-red-100">
             <p className="text-sm font-medium text-red-800 mb-1">Rejection Reason:</p>
             <p className="text-red-700">{listing.rejection_reason}</p>
+          </div>
+        )}
+
+        {listing.status === "approved" && (
+          <div className="p-6 bg-[var(--background-alt)]">
+            <div className="flex gap-3">
+              <Button
+                variant="danger"
+                onClick={handleDelist}
+                isLoading={actionLoading}
+              >
+                Delist Listing
+              </Button>
+            </div>
+            <p className="text-sm text-[var(--foreground-muted)] mt-3">
+              Delisting will remove this listing from public view. The host can still see and edit it.
+            </p>
+          </div>
+        )}
+
+        {listing.status === "delisted" && (
+          <div className="p-6 bg-yellow-50 border-t border-yellow-100">
+            <p className="text-sm font-medium text-yellow-800 mb-2">This listing has been delisted</p>
+            <p className="text-sm text-yellow-700 mb-3">
+              It is not visible to the public. You can approve it again to make it live.
+            </p>
+            <Button
+              variant="primary"
+              onClick={handleApprove}
+              isLoading={actionLoading}
+            >
+              Re-approve Listing
+            </Button>
           </div>
         )}
       </div>

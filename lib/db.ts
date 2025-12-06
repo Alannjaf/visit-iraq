@@ -11,7 +11,7 @@ export function generateId(): string {
 // Types for database models
 export type UserRole = 'admin' | 'host' | 'user';
 
-export type ListingStatus = 'pending' | 'approved' | 'rejected';
+export type ListingStatus = 'pending' | 'approved' | 'rejected' | 'delisted';
 
 export type ListingType = 
   | 'accommodation' 
