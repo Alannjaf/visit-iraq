@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { getAllListings, getPendingListings, getAllUsers, getUsersByRole } from "@/lib/db";
+import { getAllListings, getPendingListings, getAllUsers, getUsersByRole, sql } from "@/lib/db";
 
 export default async function AdminDashboard() {
   const cookieStore = await cookies();
@@ -12,12 +12,43 @@ export default async function AdminDashboard() {
   }
 
   // Fetch stats
-  const [allListings, pendingListings, allUsers, hosts] = await Promise.all([
+  const [allListings, pendingListings, allUsersRaw, hosts] = await Promise.all([
     getAllListings(),
     getPendingListings(),
     getAllUsers(),
     getUsersByRole("host"),
   ]);
+
+  // Fetch user details from neon_auth.users_sync table
+  const allUsers = await Promise.all(
+    allUsersRaw.map(async (userRole) => {
+      let email = "Unknown";
+      let displayName: string | null = null;
+      
+      try {
+        const userDetails = await sql`
+          SELECT id, email, name
+          FROM neon_auth.users_sync
+          WHERE id = ${userRole.user_id}
+          LIMIT 1
+        `;
+        
+        if (userDetails && Array.isArray(userDetails) && userDetails.length > 0) {
+          const user = userDetails[0] as { id: string; email: string | null; name: string | null };
+          email = user.email || "Unknown";
+          displayName = user.name || null;
+        }
+      } catch (error) {
+        console.error(`Error fetching user details for ${userRole.user_id}:`, error);
+      }
+      
+      return {
+        ...userRole,
+        email,
+        displayName,
+      };
+    })
+  );
 
   const approvedListings = allListings.filter(l => l.status === "approved");
   const rejectedListings = allListings.filter(l => l.status === "rejected");
@@ -167,18 +198,19 @@ export default async function AdminDashboard() {
                   className="p-4 flex items-center gap-4"
                 >
                   <div className="w-10 h-10 rounded-full bg-[var(--primary)] flex items-center justify-center text-white font-bold">
-                    {user.user_id.slice(0, 2).toUpperCase()}
+                    {user.displayName?.[0]?.toUpperCase() || user.email?.[0]?.toUpperCase() || "U"}
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="font-medium text-[var(--foreground)] truncate">
-                      User {user.user_id.slice(0, 8)}...
+                      {user.displayName || user.email || user.user_id}
                     </p>
                     <p className="text-sm text-[var(--foreground-muted)]">
-                      Joined {new Date(user.created_at).toLocaleDateString()}
+                      {user.displayName ? user.email : ""}
+                      {!user.displayName && !user.email && `Joined ${new Date(user.created_at).toLocaleDateString()}`}
                     </p>
                   </div>
                   <span className={`badge ${user.role === "host" ? "badge-host" : user.role === "admin" ? "badge-admin" : ""}`}>
-                    {user.role}
+                    {user.role.toUpperCase()}
                   </span>
                 </div>
               ))
