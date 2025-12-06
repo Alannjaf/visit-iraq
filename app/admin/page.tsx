@@ -2,6 +2,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import { getAllListings, getPendingListings, getAllUsers, getUsersByRole, sql } from "@/lib/db";
+import { getListingTypeEmoji } from "@/lib/utils";
 
 export default async function AdminDashboard() {
   const cookieStore = await cookies();
@@ -156,9 +157,7 @@ export default async function AdminDashboard() {
                   className="p-4 flex items-center gap-4 hover:bg-[var(--background-alt)] transition-colors"
                 >
                   <div className="w-12 h-12 rounded-lg bg-[var(--background-alt)] flex items-center justify-center flex-shrink-0">
-                    {listing.type === "accommodation" && "🏨"}
-                    {listing.type === "attraction" && "🏛️"}
-                    {listing.type === "tour" && "🗺️"}
+                    {getListingTypeEmoji(listing.type)}
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="font-medium text-[var(--foreground)] truncate">

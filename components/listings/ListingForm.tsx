@@ -136,9 +136,21 @@ export function ListingForm({ listing, mode }: ListingFormProps) {
               amenities: [], 
             }))}
             options={[
-              { value: "accommodation", label: "Accommodation (Hotel, Guesthouse, etc.)" },
-              { value: "attraction", label: "Attraction (Museum, Historical Site, etc.)" },
-              { value: "tour", label: "Tour (Guided Tour, Package, etc.)" },
+              { value: "accommodation", label: "🏨 Accommodation (Hotel, Guesthouse, etc.)" },
+              { value: "attraction", label: "🏛️ Attraction (Museum, Historical Site, etc.)" },
+              { value: "tour", label: "🗺️ Tour (Guided Tour, Package, etc.)" },
+              { value: "party", label: "🎉 Party" },
+              { value: "festival", label: "🎪 Festival" },
+              { value: "restaurant", label: "🍽️ Restaurant" },
+              { value: "event", label: "🎭 Event" },
+              { value: "live_music", label: "🎵 Live Music" },
+              { value: "art_culture", label: "🎨 Art & Culture" },
+              { value: "sport", label: "🏃 Sports" },
+              { value: "shopping", label: "🛍️ Shopping" },
+              { value: "nightlife", label: "🌙 Nightlife" },
+              { value: "beach", label: "🏖️ Beach" },
+              { value: "mountain", label: "⛰️ Mountain" },
+              { value: "nature", label: "🏞️ Nature" },
             ]}
           />
 

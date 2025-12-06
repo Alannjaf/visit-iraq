@@ -55,8 +55,42 @@ export function getListingTypeLabel(type: string): string {
     accommodation: 'Accommodation',
     attraction: 'Attraction',
     tour: 'Tour',
+    party: 'Party',
+    festival: 'Festival',
+    restaurant: 'Restaurant',
+    event: 'Event',
+    live_music: 'Live Music',
+    art_culture: 'Art & Culture',
+    sport: 'Sports',
+    shopping: 'Shopping',
+    nightlife: 'Nightlife',
+    beach: 'Beach',
+    mountain: 'Mountain',
+    nature: 'Nature',
   };
   return types[type] || type;
+}
+
+// Get listing type emoji
+export function getListingTypeEmoji(type: string): string {
+  const emojis: Record<string, string> = {
+    accommodation: "🏨",
+    attraction: "🏛️",
+    tour: "🗺️",
+    party: "🎉",
+    festival: "🎪",
+    restaurant: "🍽️",
+    event: "🎭",
+    live_music: "🎵",
+    art_culture: "🎨",
+    sport: "🏃",
+    shopping: "🛍️",
+    nightlife: "🌙",
+    beach: "🏖️",
+    mountain: "⛰️",
+    nature: "🏞️",
+  };
+  return emojis[type] || "📍";
 }
 
 // Get status badge color class

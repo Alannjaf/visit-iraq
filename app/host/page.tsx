@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { getListingsByHost, getUserRole } from "@/lib/db";
 import Link from "next/link";
 import { Badge, Button } from "@/components/ui";
-import { formatDate, getListingTypeLabel } from "@/lib/utils";
+import { formatDate, getListingTypeLabel, getListingTypeEmoji } from "@/lib/utils";
 
 export default async function HostDashboard() {
   const user = await stackServerApp.getUser();
@@ -108,9 +108,7 @@ export default async function HostDashboard() {
               <div key={listing.id} className="p-6 hover:bg-[var(--background-alt)] transition-colors">
                 <div className="flex items-start gap-4">
                   <div className="w-16 h-16 rounded-xl bg-[var(--background-alt)] flex items-center justify-center flex-shrink-0 text-2xl">
-                    {listing.type === "accommodation" && "🏨"}
-                    {listing.type === "attraction" && "🏛️"}
-                    {listing.type === "tour" && "🗺️"}
+                    {getListingTypeEmoji(listing.type)}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-3 mb-1">

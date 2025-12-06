@@ -13,7 +13,22 @@ export type UserRole = 'admin' | 'host' | 'user';
 
 export type ListingStatus = 'pending' | 'approved' | 'rejected';
 
-export type ListingType = 'accommodation' | 'attraction' | 'tour';
+export type ListingType = 
+  | 'accommodation' 
+  | 'attraction' 
+  | 'tour'
+  | 'party'
+  | 'festival'
+  | 'restaurant'
+  | 'event'
+  | 'live_music'
+  | 'art_culture'
+  | 'sport'
+  | 'shopping'
+  | 'nightlife'
+  | 'beach'
+  | 'mountain'
+  | 'nature';
 
 export interface UserRoleRecord {
   user_id: string;

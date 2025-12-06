@@ -11,19 +11,25 @@ interface ListingCardProps {
 }
 
 export function ListingCard({ listing, showStatus = false }: ListingCardProps) {
-  const typeEmoji = {
-    accommodation: "🏨",
-    attraction: "🏛️",
-    tour: "🗺️",
-  };
-
-  const defaultImages = {
+  const defaultImages: Record<string, string> = {
     accommodation: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&h=300&fit=crop",
     attraction: "https://images.unsplash.com/photo-1539650116574-8efeb43e2750?w=400&h=300&fit=crop",
     tour: "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=400&h=300&fit=crop",
+    party: "https://images.unsplash.com/photo-1511578314322-379afb476865?w=400&h=300&fit=crop",
+    festival: "https://images.unsplash.com/photo-1478147427282-58a87a120781?w=400&h=300&fit=crop",
+    restaurant: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=400&h=300&fit=crop",
+    event: "https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=400&h=300&fit=crop",
+    live_music: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=300&fit=crop",
+    art_culture: "https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=400&h=300&fit=crop",
+    sport: "https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=400&h=300&fit=crop",
+    shopping: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=400&h=300&fit=crop",
+    nightlife: "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=400&h=300&fit=crop",
+    beach: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&h=300&fit=crop",
+    mountain: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=400&h=300&fit=crop",
+    nature: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400&h=300&fit=crop",
   };
 
-  const imageUrl = listing.images?.[0] || defaultImages[listing.type];
+  const imageUrl = listing.images?.[0] || defaultImages[listing.type] || defaultImages.accommodation;
 
   return (
     <Link href={`/listings/${listing.id}`} className="block">
@@ -35,7 +41,7 @@ export function ListingCard({ listing, showStatus = false }: ListingCardProps) {
             alt={listing.title}
             className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
             onError={(e) => {
-              (e.target as HTMLImageElement).src = defaultImages[listing.type];
+              (e.target as HTMLImageElement).src = defaultImages[listing.type] || defaultImages.accommodation;
             }}
           />
           {showStatus && (
