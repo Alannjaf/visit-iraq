@@ -77,6 +77,7 @@ export async function POST(request: NextRequest) {
       external_link,
       images,
       videos,
+      thumbnail,
       amenities,
     } = body;
 
@@ -103,6 +104,7 @@ export async function POST(request: NextRequest) {
       external_link: external_link || "",
       images: images || [],
       videos: videos || [],
+      thumbnail: thumbnail || null,
       amenities: amenities || [],
     });
 

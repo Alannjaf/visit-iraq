@@ -171,6 +171,63 @@ export default function AdminListingDetailPage({
           </div>
         </div>
 
+        {/* Images Gallery */}
+        {listing.images && listing.images.length > 0 && (
+          <div className="p-6 border-b border-[var(--border)]">
+            <h2 className="text-lg font-bold text-[var(--foreground)] mb-4">Images</h2>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {listing.images.map((img, index) => (
+                <div key={index} className="relative group">
+                  <img
+                    src={img}
+                    alt={`${listing.title} image ${index + 1}`}
+                    className="w-full h-32 object-cover rounded-lg"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = "https://via.placeholder.com/150?text=Invalid+URL";
+                    }}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Videos */}
+        {listing.videos && listing.videos.length > 0 && (
+          <div className="p-6 border-b border-[var(--border)]">
+            <h2 className="text-lg font-bold text-[var(--foreground)] mb-4">Videos</h2>
+            <div className="space-y-4">
+              {listing.videos.map((videoUrl, index) => (
+                <div key={index} className="aspect-video bg-gray-100 rounded-lg overflow-hidden">
+                  {videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be') ? (
+                    <iframe
+                      src={videoUrl.includes('youtube.com/watch') 
+                        ? videoUrl.replace('watch?v=', 'embed/').split('&')[0]
+                        : videoUrl.replace('youtu.be/', 'youtube.com/embed/')}
+                      className="w-full h-full"
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                      allowFullScreen
+                    />
+                  ) : videoUrl.includes('vimeo.com') ? (
+                    <iframe
+                      src={`https://player.vimeo.com/video/${videoUrl.split('/').pop()}`}
+                      className="w-full h-full"
+                      allow="autoplay; fullscreen; picture-in-picture"
+                      allowFullScreen
+                    />
+                  ) : (
+                    <video
+                      src={videoUrl}
+                      className="w-full h-full object-cover"
+                      controls
+                    />
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Actions */}
         {listing.status === "pending" && (
           <div className="p-6 bg-[var(--background-alt)]">

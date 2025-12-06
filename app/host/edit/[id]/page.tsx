@@ -32,11 +32,6 @@ export default async function EditListingPage({
     redirect("/host");
   }
 
-  // Can only edit if not approved (or admin)
-  if (listing.status === "approved" && role !== "admin") {
-    redirect("/host");
-  }
-
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="mb-8">
@@ -50,12 +45,21 @@ export default async function EditListingPage({
         <p className="text-[var(--foreground-muted)] mt-2">
           {listing.status === "rejected" 
             ? "Make the requested changes and resubmit for review."
+            : listing.status === "approved"
+            ? "Editing this listing will require admin re-approval before changes go live."
             : "Update your listing details."}
         </p>
         {listing.status === "rejected" && listing.rejection_reason && (
           <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
             <p className="text-sm font-medium text-red-800 mb-1">Rejection Reason:</p>
             <p className="text-red-700">{listing.rejection_reason}</p>
+          </div>
+        )}
+        {listing.status === "approved" && (
+          <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+            <p className="text-sm font-medium text-yellow-800">
+              ⚠️ Note: Any changes to this approved listing will require admin review before going live again.
+            </p>
           </div>
         )}
       </div>

@@ -132,13 +132,11 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
     const body = await request.json();
     
-    // Hosts can only update their listings if pending or rejected
-    // Admin can update any listing
+    // If host is editing an approved listing, reset status to pending for re-approval
+    // Admin can update any listing without changing status
     if (role !== "admin" && listing.status === "approved") {
-      return NextResponse.json(
-        { error: "Cannot edit approved listings. Contact admin for changes." },
-        { status: 403 }
-      );
+      body.status = "pending";
+      body.rejection_reason = null;
     }
 
     // If host is resubmitting a rejected listing, reset status to pending

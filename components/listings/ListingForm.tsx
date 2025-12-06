@@ -37,6 +37,7 @@ export function ListingForm({ listing, mode }: ListingFormProps) {
     amenities: listing?.amenities || [],
     images: listing?.images || [],
     videos: listing?.videos || [],
+    thumbnail: listing?.thumbnail || null,
   });
 
   const [newMediaUrl, setNewMediaUrl] = useState("");
@@ -112,20 +113,35 @@ export function ListingForm({ listing, mode }: ListingFormProps) {
           videos: [...prev.videos, url],
         }));
       } else {
-        setFormData(prev => ({
-          ...prev,
-          images: [...prev.images, url],
-        }));
+        setFormData(prev => {
+          const newImages = [...prev.images, url];
+          // Auto-set first image as thumbnail if no thumbnail is selected
+          const newThumbnail = prev.thumbnail || (newImages.length === 1 ? url : prev.thumbnail);
+          return {
+            ...prev,
+            images: newImages,
+            thumbnail: newThumbnail,
+          };
+        });
       }
       setNewMediaUrl("");
     }
   };
 
   const removeImage = (index: number) => {
-    setFormData(prev => ({
-      ...prev,
-      images: prev.images.filter((_, i) => i !== index),
-    }));
+    const imageToRemove = formData.images[index];
+    setFormData(prev => {
+      const newImages = prev.images.filter((_, i) => i !== index);
+      // If thumbnail was removed, set first remaining image as thumbnail, or null if no images left
+      const newThumbnail = prev.thumbnail === imageToRemove 
+        ? (newImages.length > 0 ? newImages[0] : null)
+        : prev.thumbnail;
+      return {
+        ...prev,
+        images: newImages,
+        thumbnail: newThumbnail,
+      };
+    });
   };
 
   const removeVideo = (index: number) => {
@@ -292,7 +308,12 @@ export function ListingForm({ listing, mode }: ListingFormProps) {
 
       {/* Images & Videos */}
       <div className="bg-white rounded-xl border border-[var(--border)] p-6">
-        <h2 className="text-lg font-bold text-[var(--foreground)] mb-6">Images & Videos</h2>
+        <div className="mb-6">
+          <h2 className="text-lg font-bold text-[var(--foreground)] mb-2">Images & Videos</h2>
+          <p className="text-sm text-[var(--foreground-muted)]">
+            Add images and videos to showcase your listing. Select a thumbnail image to display on the homepage.
+          </p>
+        </div>
         <div className="space-y-4">
           <div className="flex gap-3">
             <Input
@@ -315,18 +336,36 @@ export function ListingForm({ listing, mode }: ListingFormProps) {
                     <img
                       src={url}
                       alt={`Listing image ${index + 1}`}
-                      className="w-full h-24 object-cover rounded-lg"
+                      className={`w-full h-24 object-cover rounded-lg border-2 transition-all ${
+                        formData.thumbnail === url
+                          ? "border-primary ring-2 ring-primary ring-offset-2"
+                          : "border-transparent"
+                      }`}
                       onError={(e) => {
                         (e.target as HTMLImageElement).src = "https://via.placeholder.com/150?text=Invalid+URL";
                       }}
                     />
-                    <button
-                      type="button"
-                      onClick={() => removeImage(index)}
-                      className="absolute top-2 right-2 w-6 h-6 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
-                    >
-                      ×
-                    </button>
+                    {formData.thumbnail === url && (
+                      <div className="absolute top-2 left-2 bg-primary text-white text-xs px-2 py-1 rounded">
+                        Thumbnail
+                      </div>
+                    )}
+                    <div className="absolute inset-0 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity bg-black/50 rounded-lg">
+                      <button
+                        type="button"
+                        onClick={() => setFormData(prev => ({ ...prev, thumbnail: url }))}
+                        className="px-3 py-1 bg-primary text-white text-xs rounded hover:bg-primary-light transition-colors"
+                      >
+                        Set as Thumbnail
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => removeImage(index)}
+                        className="w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center"
+                      >
+                        ×
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>

@@ -29,7 +29,8 @@ export function ListingCard({ listing, showStatus = false }: ListingCardProps) {
     nature: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=400&h=300&fit=crop",
   };
 
-  const imageUrl = listing.images?.[0] || defaultImages[listing.type] || defaultImages.accommodation;
+  // Use thumbnail if available, otherwise fall back to first image or default
+  const imageUrl = listing.thumbnail || listing.images?.[0] || defaultImages[listing.type] || defaultImages.accommodation;
 
   return (
     <Link href={`/listings/${listing.id}`} className="block">

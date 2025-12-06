@@ -33,7 +33,7 @@ export default async function ListingDetailPage({
     tour: "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=800&h=600&fit=crop",
   };
 
-  const mainImage = listing.images?.[0] || defaultImages[listing.type];
+  const mainImage = listing.thumbnail || listing.images?.[0] || defaultImages[listing.type];
 
   return (
     <div className="min-h-screen flex flex-col">

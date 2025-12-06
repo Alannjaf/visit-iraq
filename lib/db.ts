@@ -54,6 +54,7 @@ export interface Listing {
   external_link: string;
   images: string[];
   videos: string[];
+  thumbnail: string | null;
   amenities: string[];
   status: ListingStatus;
   rejection_reason: string | null;
@@ -105,16 +106,18 @@ export async function suspendUser(userId: string, suspended: boolean): Promise<v
 // Listing queries
 export async function createListing(listing: Omit<Listing, 'id' | 'created_at' | 'updated_at' | 'status' | 'rejection_reason'>): Promise<Listing> {
   const id = generateId();
+  // Auto-set first image as thumbnail if no thumbnail is provided and images exist
+  const thumbnail = listing.thumbnail || (listing.images && listing.images.length > 0 ? listing.images[0] : null);
   const result = await sql`
     INSERT INTO listings (
       id, host_id, type, title, description, location, city, region,
       full_address, price_range, contact_phone, contact_email, external_link,
-      images, videos, amenities, status, created_at, updated_at
+      images, videos, thumbnail, amenities, status, created_at, updated_at
     ) VALUES (
       ${id}, ${listing.host_id}, ${listing.type}, ${listing.title}, ${listing.description},
       ${listing.location}, ${listing.city}, ${listing.region}, ${listing.full_address},
       ${listing.price_range}, ${listing.contact_phone}, ${listing.contact_email},
-      ${listing.external_link}, ${listing.images}, ${listing.videos || []}, ${listing.amenities},
+      ${listing.external_link}, ${listing.images}, ${listing.videos || []}, ${thumbnail}, ${listing.amenities},
       'pending', NOW(), NOW()
     )
     RETURNING *
@@ -127,8 +130,14 @@ export async function updateListing(id: string, updates: Partial<Listing>): Prom
   const current = await getListingById(id);
   if (!current) return null;
 
+  // Auto-set first image as thumbnail if no thumbnail is provided and images exist
+  const images = updates.images !== undefined ? updates.images : current.images;
+  const thumbnail = updates.thumbnail !== undefined 
+    ? updates.thumbnail 
+    : (current.thumbnail || (images && images.length > 0 ? images[0] : null));
+
   // Merge updates with current data
-  const updated = { ...current, ...updates, updated_at: new Date() };
+  const updated = { ...current, ...updates, thumbnail, updated_at: new Date() };
 
   const result = await sql`
     UPDATE listings SET
@@ -145,6 +154,7 @@ export async function updateListing(id: string, updates: Partial<Listing>): Prom
       external_link = ${updated.external_link},
       images = ${updated.images},
       videos = ${updated.videos || []},
+      thumbnail = ${thumbnail},
       amenities = ${updated.amenities},
       status = ${updated.status},
       rejection_reason = ${updated.rejection_reason},
