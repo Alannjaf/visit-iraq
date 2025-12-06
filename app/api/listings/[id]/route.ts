@@ -76,6 +76,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         city: listing.city,
         region: listing.region,
         images: listing.images,
+        videos: listing.videos || [],
         amenities: listing.amenities,
         status: listing.status,
         created_at: listing.created_at,

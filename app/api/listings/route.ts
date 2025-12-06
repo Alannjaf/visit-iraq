@@ -76,6 +76,7 @@ export async function POST(request: NextRequest) {
       contact_email,
       external_link,
       images,
+      videos,
       amenities,
     } = body;
 
@@ -101,6 +102,7 @@ export async function POST(request: NextRequest) {
       contact_email: contact_email || "",
       external_link: external_link || "",
       images: images || [],
+      videos: videos || [],
       amenities: amenities || [],
     });
 

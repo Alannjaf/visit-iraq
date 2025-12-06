@@ -53,6 +53,7 @@ export interface Listing {
   contact_email: string;
   external_link: string;
   images: string[];
+  videos: string[];
   amenities: string[];
   status: ListingStatus;
   rejection_reason: string | null;
@@ -108,12 +109,12 @@ export async function createListing(listing: Omit<Listing, 'id' | 'created_at' |
     INSERT INTO listings (
       id, host_id, type, title, description, location, city, region,
       full_address, price_range, contact_phone, contact_email, external_link,
-      images, amenities, status, created_at, updated_at
+      images, videos, amenities, status, created_at, updated_at
     ) VALUES (
       ${id}, ${listing.host_id}, ${listing.type}, ${listing.title}, ${listing.description},
       ${listing.location}, ${listing.city}, ${listing.region}, ${listing.full_address},
       ${listing.price_range}, ${listing.contact_phone}, ${listing.contact_email},
-      ${listing.external_link}, ${listing.images}, ${listing.amenities},
+      ${listing.external_link}, ${listing.images}, ${listing.videos || []}, ${listing.amenities},
       'pending', NOW(), NOW()
     )
     RETURNING *
@@ -143,6 +144,7 @@ export async function updateListing(id: string, updates: Partial<Listing>): Prom
       contact_email = ${updated.contact_email},
       external_link = ${updated.external_link},
       images = ${updated.images},
+      videos = ${updated.videos || []},
       amenities = ${updated.amenities},
       status = ${updated.status},
       rejection_reason = ${updated.rejection_reason},

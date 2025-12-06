@@ -36,9 +36,10 @@ export function ListingForm({ listing, mode }: ListingFormProps) {
     external_link: listing?.external_link || "",
     amenities: listing?.amenities || [],
     images: listing?.images || [],
+    videos: listing?.videos || [],
   });
 
-  const [newImageUrl, setNewImageUrl] = useState("");
+  const [newMediaUrl, setNewMediaUrl] = useState("");
 
   const getAmenitiesList = () => {
     switch (formData.type) {
@@ -94,13 +95,29 @@ export function ListingForm({ listing, mode }: ListingFormProps) {
     }));
   };
 
-  const addImage = () => {
-    if (newImageUrl.trim()) {
-      setFormData(prev => ({
-        ...prev,
-        images: [...prev.images, newImageUrl.trim()],
-      }));
-      setNewImageUrl("");
+  const isVideoUrl = (url: string): boolean => {
+    const videoExtensions = ['.mp4', '.webm', '.ogg', '.mov', '.avi'];
+    const videoDomains = ['youtube.com', 'youtu.be', 'vimeo.com', 'dailymotion.com'];
+    const lowerUrl = url.toLowerCase();
+    return videoExtensions.some(ext => lowerUrl.includes(ext)) || 
+           videoDomains.some(domain => lowerUrl.includes(domain));
+  };
+
+  const addMedia = () => {
+    if (newMediaUrl.trim()) {
+      const url = newMediaUrl.trim();
+      if (isVideoUrl(url)) {
+        setFormData(prev => ({
+          ...prev,
+          videos: [...prev.videos, url],
+        }));
+      } else {
+        setFormData(prev => ({
+          ...prev,
+          images: [...prev.images, url],
+        }));
+      }
+      setNewMediaUrl("");
     }
   };
 
@@ -108,6 +125,13 @@ export function ListingForm({ listing, mode }: ListingFormProps) {
     setFormData(prev => ({
       ...prev,
       images: prev.images.filter((_, i) => i !== index),
+    }));
+  };
+
+  const removeVideo = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      videos: prev.videos.filter((_, i) => i !== index),
     }));
   };
 
@@ -266,43 +290,90 @@ export function ListingForm({ listing, mode }: ListingFormProps) {
         </div>
       </div>
 
-      {/* Images */}
+      {/* Images & Videos */}
       <div className="bg-white rounded-xl border border-[var(--border)] p-6">
-        <h2 className="text-lg font-bold text-[var(--foreground)] mb-6">Images</h2>
+        <h2 className="text-lg font-bold text-[var(--foreground)] mb-6">Images & Videos</h2>
         <div className="space-y-4">
           <div className="flex gap-3">
             <Input
-              value={newImageUrl}
-              onChange={(e) => setNewImageUrl(e.target.value)}
-              placeholder="Enter image URL"
+              value={newMediaUrl}
+              onChange={(e) => setNewMediaUrl(e.target.value)}
+              placeholder="Enter image or video URL"
               className="flex-1"
             />
-            <Button type="button" variant="secondary" onClick={addImage}>
-              Add Image
+            <Button type="button" variant="secondary" onClick={addMedia}>
+              Add Image/Video
             </Button>
           </div>
           
           {formData.images.length > 0 && (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {formData.images.map((url, index) => (
-                <div key={index} className="relative group">
-                  <img
-                    src={url}
-                    alt={`Listing image ${index + 1}`}
-                    className="w-full h-24 object-cover rounded-lg"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src = "https://via.placeholder.com/150?text=Invalid+URL";
-                    }}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => removeImage(index)}
-                    className="absolute top-2 right-2 w-6 h-6 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
-                  >
-                    ×
-                  </button>
-                </div>
-              ))}
+            <div>
+              <h3 className="text-sm font-medium text-[var(--foreground-muted)] mb-2">Images</h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {formData.images.map((url, index) => (
+                  <div key={index} className="relative group">
+                    <img
+                      src={url}
+                      alt={`Listing image ${index + 1}`}
+                      className="w-full h-24 object-cover rounded-lg"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = "https://via.placeholder.com/150?text=Invalid+URL";
+                      }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removeImage(index)}
+                      className="absolute top-2 right-2 w-6 h-6 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {formData.videos.length > 0 && (
+            <div>
+              <h3 className="text-sm font-medium text-[var(--foreground-muted)] mb-2">Videos</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {formData.videos.map((url, index) => (
+                  <div key={index} className="relative group">
+                    <div className="w-full aspect-video bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
+                      {url.includes('youtube.com') || url.includes('youtu.be') ? (
+                        <iframe
+                          src={url.includes('youtube.com/watch') 
+                            ? url.replace('watch?v=', 'embed/').split('&')[0]
+                            : url.replace('youtu.be/', 'youtube.com/embed/')}
+                          className="w-full h-full"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                        />
+                      ) : url.includes('vimeo.com') ? (
+                        <iframe
+                          src={`https://player.vimeo.com/video/${url.split('/').pop()}`}
+                          className="w-full h-full"
+                          allow="autoplay; fullscreen; picture-in-picture"
+                          allowFullScreen
+                        />
+                      ) : (
+                        <video
+                          src={url}
+                          className="w-full h-full object-cover"
+                          controls
+                        />
+                      )}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => removeVideo(index)}
+                      className="absolute top-2 right-2 w-6 h-6 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
         </div>

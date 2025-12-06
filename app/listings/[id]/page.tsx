@@ -85,6 +85,42 @@ export default async function ListingDetailPage({
                 )}
               </div>
 
+              {/* Videos */}
+              {listing.videos && listing.videos.length > 0 && (
+                <div className="bg-white rounded-xl border border-[var(--border)] p-6">
+                  <h2 className="text-xl font-bold text-[var(--foreground)] mb-4">Videos</h2>
+                  <div className="space-y-4">
+                    {listing.videos.map((videoUrl, index) => (
+                      <div key={index} className="aspect-video bg-gray-100 rounded-lg overflow-hidden">
+                        {videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be') ? (
+                          <iframe
+                            src={videoUrl.includes('youtube.com/watch') 
+                              ? videoUrl.replace('watch?v=', 'embed/').split('&')[0]
+                              : videoUrl.replace('youtu.be/', 'youtube.com/embed/')}
+                            className="w-full h-full"
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                          />
+                        ) : videoUrl.includes('vimeo.com') ? (
+                          <iframe
+                            src={`https://player.vimeo.com/video/${videoUrl.split('/').pop()}`}
+                            className="w-full h-full"
+                            allow="autoplay; fullscreen; picture-in-picture"
+                            allowFullScreen
+                          />
+                        ) : (
+                          <video
+                            src={videoUrl}
+                            className="w-full h-full object-cover"
+                            controls
+                          />
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {/* Header Info */}
               <div className="bg-white rounded-xl border border-[var(--border)] p-6">
                 <div className="flex items-center gap-3 mb-4">
