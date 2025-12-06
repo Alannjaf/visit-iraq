@@ -3,7 +3,9 @@
 import Link from "next/link";
 import { useUser, UserButton } from "@stackframe/stack";
 import { Button } from "@/components/ui/Button";
+import { Modal } from "@/components/ui/Modal";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 interface HeaderProps {
   userRole?: "admin" | "host" | "user" | null;
@@ -11,7 +13,34 @@ interface HeaderProps {
 
 export function Header({ userRole }: HeaderProps) {
   const user = useUser();
+  const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [upgrading, setUpgrading] = useState(false);
+
+  const handleBecomeHostClick = () => {
+    setShowConfirmModal(true);
+  };
+
+  const handleConfirmUpgrade = async () => {
+    setUpgrading(true);
+    try {
+      const res = await fetch("/api/user/role", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ requestedRole: "host" }),
+      });
+      if (res.ok) {
+        setShowConfirmModal(false);
+        router.push("/host");
+        router.refresh();
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setUpgrading(false);
+    }
+  };
 
   return (
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-sm border-b border-[var(--border)]">
@@ -29,38 +58,20 @@ export function Header({ userRole }: HeaderProps) {
             </span>
           </Link>
 
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-6">
-            <Link
-              href="/"
-              className="text-[var(--foreground-muted)] hover:text-[var(--primary)] font-medium transition-colors"
-            >
-              Explore
-            </Link>
-            <Link
-              href="/?type=accommodation"
-              className="text-[var(--foreground-muted)] hover:text-[var(--primary)] font-medium transition-colors"
-            >
-              Accommodations
-            </Link>
-            <Link
-              href="/?type=attraction"
-              className="text-[var(--foreground-muted)] hover:text-[var(--primary)] font-medium transition-colors"
-            >
-              Attractions
-            </Link>
-            <Link
-              href="/?type=tour"
-              className="text-[var(--foreground-muted)] hover:text-[var(--primary)] font-medium transition-colors"
-            >
-              Tours
-            </Link>
-          </nav>
 
           {/* Auth Section */}
           <div className="hidden md:flex items-center gap-4">
             {user ? (
               <div className="flex items-center gap-4">
+                {userRole === "user" && (
+                  <Button 
+                    variant="secondary" 
+                    size="sm"
+                    onClick={handleBecomeHostClick}
+                  >
+                    Become a Host
+                  </Button>
+                )}
                 {userRole === "admin" && (
                   <Link href="/admin">
                     <Button variant="ghost" size="sm">Admin Panel</Button>
@@ -107,33 +118,16 @@ export function Header({ userRole }: HeaderProps) {
         {mobileMenuOpen && (
           <div className="md:hidden py-4 border-t border-[var(--border)]">
             <nav className="flex flex-col gap-2">
-              <Link
-                href="/"
-                className="px-4 py-2 text-[var(--foreground-muted)] hover:text-[var(--primary)] hover:bg-[var(--background-alt)] rounded-lg font-medium transition-colors"
-              >
-                Explore
-              </Link>
-              <Link
-                href="/?type=accommodation"
-                className="px-4 py-2 text-[var(--foreground-muted)] hover:text-[var(--primary)] hover:bg-[var(--background-alt)] rounded-lg font-medium transition-colors"
-              >
-                Accommodations
-              </Link>
-              <Link
-                href="/?type=attraction"
-                className="px-4 py-2 text-[var(--foreground-muted)] hover:text-[var(--primary)] hover:bg-[var(--background-alt)] rounded-lg font-medium transition-colors"
-              >
-                Attractions
-              </Link>
-              <Link
-                href="/?type=tour"
-                className="px-4 py-2 text-[var(--foreground-muted)] hover:text-[var(--primary)] hover:bg-[var(--background-alt)] rounded-lg font-medium transition-colors"
-              >
-                Tours
-              </Link>
-              <hr className="my-2 border-[var(--border)]" />
               {user ? (
                 <>
+                  {userRole === "user" && (
+                    <button
+                      onClick={handleBecomeHostClick}
+                      className="px-4 py-2 text-center bg-[var(--secondary)] text-white rounded-lg font-medium hover:bg-[var(--secondary-dark)] transition-colors"
+                    >
+                      Become a Host
+                    </button>
+                  )}
                   {userRole === "admin" && (
                     <Link
                       href="/admin"
@@ -177,6 +171,76 @@ export function Header({ userRole }: HeaderProps) {
           </div>
         )}
       </div>
+
+      {/* Become a Host Confirmation Modal */}
+      <Modal
+        isOpen={showConfirmModal}
+        onClose={() => !upgrading && setShowConfirmModal(false)}
+        title="Become a Host"
+        size="lg"
+      >
+        <div className="space-y-6">
+          {/* Icon */}
+          <div className="flex justify-center">
+            <div className="w-20 h-20 rounded-full bg-[var(--secondary)]/20 flex items-center justify-center">
+              <svg className="w-10 h-10 text-[var(--secondary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              </svg>
+            </div>
+          </div>
+
+          {/* Information */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-[var(--foreground)] text-center">
+              Ready to share your place with travelers?
+            </h3>
+            
+            <div className="space-y-3 text-[var(--foreground-muted)]">
+              <p className="text-sm">
+                As a host on Visit Iraq, you can:
+              </p>
+              
+              <ul className="space-y-2 text-sm list-disc list-inside">
+                <li>Create and manage listings for accommodations, attractions, or tours</li>
+                <li>Share your space with travelers from around the world</li>
+                <li>Help visitors discover the beauty and heritage of Iraq</li>
+                <li>Set your own pricing and availability</li>
+                <li>Receive inquiries directly from interested travelers</li>
+              </ul>
+
+              <div className="mt-4 p-4 bg-[var(--background-alt)] rounded-lg">
+                <p className="text-sm font-medium text-[var(--foreground)] mb-2">
+                  What happens next?
+                </p>
+                <p className="text-sm text-[var(--foreground-muted)]">
+                  After upgrading, you&apos;ll be redirected to your Host Dashboard where you can create your first listing. 
+                  All listings are reviewed by our admin team before being published to ensure quality.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Actions */}
+          <div className="flex gap-3 pt-4">
+            <Button
+              variant="outline"
+              onClick={() => setShowConfirmModal(false)}
+              disabled={upgrading}
+              className="flex-1"
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="secondary"
+              onClick={handleConfirmUpgrade}
+              isLoading={upgrading}
+              className="flex-1"
+            >
+              Yes, Become a Host
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </header>
   );
 }
