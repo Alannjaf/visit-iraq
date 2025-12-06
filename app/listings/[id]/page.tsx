@@ -48,8 +48,8 @@ export default async function ListingDetailPage({
                 Home
               </Link>
               <span className="text-[var(--foreground-muted)]">/</span>
-              <Link href="/listings" className="text-[var(--foreground-muted)] hover:text-[var(--primary)]">
-                Listings
+              <Link href="/" className="text-[var(--foreground-muted)] hover:text-[var(--primary)]">
+                Home
               </Link>
               <span className="text-[var(--foreground-muted)]">/</span>
               <span className="text-[var(--foreground)]">{listing.title}</span>

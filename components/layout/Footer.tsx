@@ -29,22 +29,22 @@ export function Footer() {
             <h3 className="font-semibold text-[var(--secondary)] mb-4">Explore</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/listings?type=accommodation" className="text-white/70 hover:text-white transition-colors">
+                <Link href="/?type=accommodation" className="text-white/70 hover:text-white transition-colors">
                   Accommodations
                 </Link>
               </li>
               <li>
-                <Link href="/listings?type=attraction" className="text-white/70 hover:text-white transition-colors">
+                <Link href="/?type=attraction" className="text-white/70 hover:text-white transition-colors">
                   Attractions
                 </Link>
               </li>
               <li>
-                <Link href="/listings?type=tour" className="text-white/70 hover:text-white transition-colors">
+                <Link href="/?type=tour" className="text-white/70 hover:text-white transition-colors">
                   Tours
                 </Link>
               </li>
               <li>
-                <Link href="/listings" className="text-white/70 hover:text-white transition-colors">
+                <Link href="/" className="text-white/70 hover:text-white transition-colors">
                   All Listings
                 </Link>
               </li>
@@ -56,22 +56,22 @@ export function Footer() {
             <h3 className="font-semibold text-[var(--secondary)] mb-4">Popular Regions</h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/listings?city=Baghdad" className="text-white/70 hover:text-white transition-colors">
+                <Link href="/?city=Baghdad" className="text-white/70 hover:text-white transition-colors">
                   Baghdad
                 </Link>
               </li>
               <li>
-                <Link href="/listings?city=Erbil" className="text-white/70 hover:text-white transition-colors">
+                <Link href="/?city=Erbil" className="text-white/70 hover:text-white transition-colors">
                   Erbil
                 </Link>
               </li>
               <li>
-                <Link href="/listings?city=Basra" className="text-white/70 hover:text-white transition-colors">
+                <Link href="/?city=Basra" className="text-white/70 hover:text-white transition-colors">
                   Basra
                 </Link>
               </li>
               <li>
-                <Link href="/listings?city=Najaf" className="text-white/70 hover:text-white transition-colors">
+                <Link href="/?city=Najaf" className="text-white/70 hover:text-white transition-colors">
                   Najaf
                 </Link>
               </li>

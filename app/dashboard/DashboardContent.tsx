@@ -106,7 +106,7 @@ export function DashboardContent({ user, userRole: initialRole, showUpgrade }: D
 
           {/* Quick Actions */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            <Link href="/listings">
+                <Link href="/">
               <Card className="h-full">
                 <CardContent className="p-6 flex items-center gap-4">
                   <div className="w-12 h-12 rounded-lg bg-blue-100 text-blue-600 flex items-center justify-center">

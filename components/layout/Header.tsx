@@ -32,25 +32,25 @@ export function Header({ userRole }: HeaderProps) {
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-6">
             <Link
-              href="/listings"
+              href="/"
               className="text-[var(--foreground-muted)] hover:text-[var(--primary)] font-medium transition-colors"
             >
               Explore
             </Link>
             <Link
-              href="/listings?type=accommodation"
+              href="/?type=accommodation"
               className="text-[var(--foreground-muted)] hover:text-[var(--primary)] font-medium transition-colors"
             >
               Accommodations
             </Link>
             <Link
-              href="/listings?type=attraction"
+              href="/?type=attraction"
               className="text-[var(--foreground-muted)] hover:text-[var(--primary)] font-medium transition-colors"
             >
               Attractions
             </Link>
             <Link
-              href="/listings?type=tour"
+              href="/?type=tour"
               className="text-[var(--foreground-muted)] hover:text-[var(--primary)] font-medium transition-colors"
             >
               Tours
@@ -108,25 +108,25 @@ export function Header({ userRole }: HeaderProps) {
           <div className="md:hidden py-4 border-t border-[var(--border)]">
             <nav className="flex flex-col gap-2">
               <Link
-                href="/listings"
+                href="/"
                 className="px-4 py-2 text-[var(--foreground-muted)] hover:text-[var(--primary)] hover:bg-[var(--background-alt)] rounded-lg font-medium transition-colors"
               >
                 Explore
               </Link>
               <Link
-                href="/listings?type=accommodation"
+                href="/?type=accommodation"
                 className="px-4 py-2 text-[var(--foreground-muted)] hover:text-[var(--primary)] hover:bg-[var(--background-alt)] rounded-lg font-medium transition-colors"
               >
                 Accommodations
               </Link>
               <Link
-                href="/listings?type=attraction"
+                href="/?type=attraction"
                 className="px-4 py-2 text-[var(--foreground-muted)] hover:text-[var(--primary)] hover:bg-[var(--background-alt)] rounded-lg font-medium transition-colors"
               >
                 Attractions
               </Link>
               <Link
-                href="/listings?type=tour"
+                href="/?type=tour"
                 className="px-4 py-2 text-[var(--foreground-muted)] hover:text-[var(--primary)] hover:bg-[var(--background-alt)] rounded-lg font-medium transition-colors"
               >
                 Tours
