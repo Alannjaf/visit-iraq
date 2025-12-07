@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { getUserRole } from "@/lib/db";
 import { Link } from '@/i18n/routing';
 import { UserButton } from "@stackframe/stack";
+import Image from "next/image";
 
 export default async function HostLayout({
   children,
@@ -31,12 +32,14 @@ export default async function HostLayout({
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center gap-8">
               <Link href="/" className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[var(--primary)] to-[var(--primary-light)] flex items-center justify-center">
-                  <svg className="w-5 h-5 text-[var(--secondary)]" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
-                  </svg>
-                </div>
-                <span className="font-bold text-[var(--primary)]">Host Dashboard</span>
+                <Image
+                  src="/logo.svg"
+                  alt="Visit Iraq"
+                  width={234}
+                  height={78}
+                  className="h-[50px] w-auto"
+                  priority
+                />
               </Link>
               <div className="hidden md:flex items-center gap-6">
                 <Link 

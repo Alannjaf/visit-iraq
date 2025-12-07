@@ -19,7 +19,7 @@ export function AdminNav() {
   };
 
   return (
-    <nav className="bg-[var(--primary)] text-white">
+    <nav className="bg-white border-b border-[var(--border)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center gap-8">
@@ -34,26 +34,26 @@ export function AdminNav() {
               />
             </Link>
             <div className="hidden md:flex items-center gap-6">
-              <Link href="/admin" className="hover:text-[var(--secondary)] transition-colors">
+              <Link href="/admin" className="text-[var(--foreground-muted)] hover:text-[var(--primary)] transition-colors">
                 Dashboard
               </Link>
-              <Link href="/admin/listings" className="hover:text-[var(--secondary)] transition-colors">
+              <Link href="/admin/listings" className="text-[var(--foreground-muted)] hover:text-[var(--primary)] transition-colors">
                 Listings
               </Link>
-              <Link href="/admin/users" className="hover:text-[var(--secondary)] transition-colors">
+              <Link href="/admin/users" className="text-[var(--foreground-muted)] hover:text-[var(--primary)] transition-colors">
                 Users
               </Link>
             </div>
           </div>
           <div className="flex items-center gap-4">
-            <Link href="/" className="text-white/70 hover:text-white transition-colors text-sm">
+            <Link href="/" className="text-[var(--foreground-muted)] hover:text-[var(--primary)] transition-colors text-sm">
               View Site
             </Link>
             <button
               type="button"
               onClick={handleLogout}
               disabled={loggingOut}
-              className="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg transition-colors text-sm disabled:opacity-60"
+              className="px-4 py-2 bg-[var(--primary)] hover:bg-[var(--primary-dark)] text-white rounded-lg transition-colors text-sm disabled:opacity-60"
             >
               {loggingOut ? "Logging out..." : "Logout"}
             </button>
