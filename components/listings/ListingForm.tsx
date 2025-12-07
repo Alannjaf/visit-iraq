@@ -21,6 +21,7 @@ export function ListingForm({ listing, mode }: ListingFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [imagesVideosError, setImagesVideosError] = useState(false);
 
   const [formData, setFormData] = useState({
     type: listing?.type || "accommodation",
@@ -58,7 +59,52 @@ export function ListingForm({ listing, mode }: ListingFormProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setImagesVideosError(false);
     setLoading(true);
+
+    // Validate required fields
+    if (!formData.title.trim()) {
+      setError("Title is required");
+      setLoading(false);
+      return;
+    }
+
+    if (!formData.description.trim()) {
+      setError("Description is required");
+      setLoading(false);
+      return;
+    }
+
+    if (!formData.region) {
+      setError("Region is required");
+      setLoading(false);
+      return;
+    }
+
+    if (!formData.city) {
+      setError("City is required");
+      setLoading(false);
+      return;
+    }
+
+    if (!formData.location.trim()) {
+      setError("Location/Area is required");
+      setLoading(false);
+      return;
+    }
+
+    if (!formData.full_address.trim()) {
+      setError("Full Address is required");
+      setLoading(false);
+      return;
+    }
+
+    if (formData.images.length === 0 && formData.videos.length === 0) {
+      setError("At least one image or video is required");
+      setImagesVideosError(true);
+      setLoading(false);
+      return;
+    }
 
     try {
       const url = mode === "create" 
@@ -125,6 +171,7 @@ export function ListingForm({ listing, mode }: ListingFormProps) {
         });
       }
       setNewMediaUrl("");
+      setImagesVideosError(false); // Clear error when media is added
     }
   };
 
@@ -195,7 +242,7 @@ export function ListingForm({ listing, mode }: ListingFormProps) {
           />
 
           <Input
-            label="Title"
+            label="Title *"
             value={formData.title}
             onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
             placeholder="e.g., Grand Hotel Baghdad, Ancient Babylon Tour"
@@ -203,7 +250,7 @@ export function ListingForm({ listing, mode }: ListingFormProps) {
           />
 
           <Textarea
-            label="Description"
+            label="Description *"
             value={formData.description}
             onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
             placeholder="Describe your listing in detail..."
@@ -216,6 +263,7 @@ export function ListingForm({ listing, mode }: ListingFormProps) {
             value={formData.price_range}
             onChange={(e) => setFormData(prev => ({ ...prev, price_range: e.target.value }))}
             options={[
+              { value: "free", label: "🆓 Free" },
               { value: "budget", label: "$ Budget-friendly" },
               { value: "moderate", label: "$$ Moderate" },
               { value: "premium", label: "$$$ Premium" },
@@ -231,7 +279,7 @@ export function ListingForm({ listing, mode }: ListingFormProps) {
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Select
-              label="Region"
+              label="Region *"
               value={formData.region}
               onChange={(e) => setFormData(prev => ({ 
                 ...prev, 
@@ -244,7 +292,7 @@ export function ListingForm({ listing, mode }: ListingFormProps) {
             />
 
             <Select
-              label="City"
+              label="City *"
               value={formData.city}
               onChange={(e) => setFormData(prev => ({ ...prev, city: e.target.value }))}
               placeholder="Select city"
@@ -255,7 +303,7 @@ export function ListingForm({ listing, mode }: ListingFormProps) {
           </div>
 
           <Input
-            label="Location/Area"
+            label="Location/Area *"
             value={formData.location}
             onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
             placeholder="e.g., City Center, Near the Citadel"
@@ -263,10 +311,11 @@ export function ListingForm({ listing, mode }: ListingFormProps) {
           />
 
           <Input
-            label="Full Address (shown to registered users)"
+            label="Full Address (shown to registered users) *"
             value={formData.full_address}
             onChange={(e) => setFormData(prev => ({ ...prev, full_address: e.target.value }))}
             placeholder="Full street address"
+            required
           />
         </div>
       </div>
@@ -307,12 +356,19 @@ export function ListingForm({ listing, mode }: ListingFormProps) {
       </div>
 
       {/* Images & Videos */}
-      <div className="bg-white rounded-xl border border-[var(--border)] p-6">
+      <div className={`bg-white rounded-xl border p-6 ${imagesVideosError ? 'border-red-500 border-2' : 'border-[var(--border)]'}`}>
         <div className="mb-6">
-          <h2 className="text-lg font-bold text-[var(--foreground)] mb-2">Images & Videos</h2>
+          <h2 className="text-lg font-bold text-[var(--foreground)] mb-2">
+            Images & Videos <span className="text-red-500">*</span>
+          </h2>
           <p className="text-sm text-[var(--foreground-muted)]">
-            Add images and videos to showcase your listing. Select a thumbnail image to display on the homepage.
+            Add at least one image or video to showcase your listing. Select a thumbnail image to display on the homepage.
           </p>
+          {imagesVideosError && (
+            <p className="text-sm text-red-600 mt-2 font-medium">
+              ⚠️ At least one image or video is required
+            </p>
+          )}
         </div>
         <div className="space-y-4">
           <div className="flex gap-3">
