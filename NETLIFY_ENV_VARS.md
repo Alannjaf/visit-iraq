@@ -38,6 +38,24 @@ Set these environment variables in your Netlify dashboard (Site settings > Envir
 - Never commit `.env.local` or `.env` files to git
 - Update `NEXT_PUBLIC_APP_URL` after your first deployment with the actual Netlify URL
 
+## Stack Auth Domain Whitelisting (IMPORTANT!)
+
+After deploying to Netlify, you **MUST** whitelist your Netlify domain in Stack Auth:
+
+1. Go to your [Stack Auth Dashboard](https://stack-auth.com/dashboard)
+2. Navigate to your project settings
+3. Find the **"Trusted Domains"** or **"Allowed Redirect URLs"** section
+4. Add your Netlify domain(s):
+   - `https://your-site.netlify.app` (your main domain)
+   - `https://your-site.netlify.app/*` (to allow all paths)
+   - If you have a custom domain, add that too: `https://yourdomain.com` and `https://yourdomain.com/*`
+
+**Without this step, OAuth (Google, etc.) login will fail with:**
+```
+"REDIRECT_URL_NOT_WHITELISTED"
+"Redirect URL not whitelisted. Did you forget to add this domain to the trusted domains list on the Stack Auth dashboard?"
+```
+
 ## Build Error Troubleshooting
 
 If you see this error during build:
