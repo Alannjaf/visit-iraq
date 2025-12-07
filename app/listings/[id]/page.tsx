@@ -5,7 +5,7 @@ import { Header, Footer } from "@/components/layout";
 import { Button, Badge } from "@/components/ui";
 import { stackServerApp } from "@/stack";
 import { getListingTypeLabel, formatPriceRange, formatDate } from "@/lib/utils";
-import { SafeImage } from "@/components/listings/SafeImage";
+import { ImageGallery } from "@/components/listings/ImageGallery";
 
 export default async function ListingDetailPage({
   params,
@@ -62,28 +62,12 @@ export default async function ListingDetailPage({
             {/* Main Content */}
             <div className="lg:col-span-2 space-y-6">
               {/* Image Gallery */}
-              <div className="bg-white rounded-xl border border-[var(--border)] overflow-hidden">
-                <div className="aspect-video relative">
-                  <SafeImage
-                    src={mainImage}
-                    alt={listing.title}
-                    className="w-full h-full object-cover"
-                    fallbackSrc={defaultImages[listing.type]}
-                  />
-                </div>
-                {listing.images && listing.images.length > 1 && (
-                  <div className="p-4 flex gap-2 overflow-x-auto">
-                    {listing.images.slice(1, 5).map((img, index) => (
-                      <img
-                        key={index}
-                        src={img}
-                        alt={`${listing.title} ${index + 2}`}
-                        className="w-24 h-16 object-cover rounded-lg flex-shrink-0"
-                      />
-                    ))}
-                  </div>
-                )}
-              </div>
+              <ImageGallery
+                images={listing.images || []}
+                title={listing.title}
+                defaultImage={mainImage}
+                fallbackSrc={defaultImages[listing.type]}
+              />
 
               {/* Videos */}
               {listing.videos && listing.videos.length > 0 && (

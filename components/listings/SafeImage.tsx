@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface SafeImageProps {
   src: string;
@@ -11,6 +11,11 @@ interface SafeImageProps {
 
 export function SafeImage({ src, alt, className, fallbackSrc }: SafeImageProps) {
   const [imgSrc, setImgSrc] = useState(src);
+
+  // Update image source when src prop changes
+  useEffect(() => {
+    setImgSrc(src);
+  }, [src]);
 
   return (
     <img
