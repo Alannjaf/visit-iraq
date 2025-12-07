@@ -1,0 +1,73 @@
+{
+  "common": {
+    "signIn": "چوونەژوورەوە",
+    "signUp": "خۆتۆمارکردن",
+    "dashboard": "داشبۆرد",
+    "adminPanel": "پانێلی بەڕێوەبردن",
+    "hostDashboard": "داشبۆردی میوانداری",
+    "becomeHost": "ببە بە میواندار",
+    "cancel": "هەڵوەشاندنەوە",
+    "clearFilters": "پاککردنەوەی فیلتەرەکان",
+    "allCities": "هەموو شارەکان",
+    "search": "گەڕان",
+    "viewAllListings": "بینینی هەموو لیستەکان"
+  },
+  "header": {
+    "becomeHostTitle": "ببە بە میواندار",
+    "becomeHostDescription": "ئامادەییت شوێنەکەت بگەیەنیت بە گەشتیاران؟",
+    "becomeHostInfo": "وەک میواندار لە Visit Iraq، دەتوانیت:",
+    "becomeHostFeature1": "لیست بۆ نیشتەجێبوون، شوێنە سەرنجڕاکێشەکان، یان گەشت دروست بکەیت و بەڕێوەبیبیت",
+    "becomeHostFeature2": "شوێنەکەت لەگەڵ گەشتیارانی لە هەموو جیهاندا هاوبەش بکەیت",
+    "becomeHostFeature3": "یارمەتی بینەران بدەیت بۆ دۆزینەوەی جوانی و میراتی عێراق",
+    "becomeHostFeature4": "نرخی خۆت و بەردەستبوون دیاری بکەیت",
+    "becomeHostFeature5": "پرسیارەکان بە ڕاستەوخۆ لە گەشتیارانی بایەخدار وەربگریت",
+    "whatHappensNext": "چی ڕوودەدات؟",
+    "whatHappensNextDescription": "دوای بەرزکردنەوە، دەگەڕێیت بۆ داشبۆردی میوانداریت کە دەتوانیت یەکەم لیستت دروست بکەیت. هەموو لیستەکان لەلایەن تیمی بەڕێوەبردنەوە پێداچوونەوە دەکرێن پێش بڵاوکردنەوە بۆ دڵنیابوون لە جۆری.",
+    "yesBecomeHost": "بەڵێ، ببە بە میواندار"
+  },
+  "footer": {
+    "copyright": "© {year} Visit Iraq. هەموو مافەکان پارێزراون.",
+    "privacyPolicy": "سیاسەتی تایبەتمەندی",
+    "termsOfService": "مەرجەکانی خزمەتگوزاری"
+  },
+  "home": {
+    "searchPlaceholder": "گەڕان بە دوای گەشتنەکان، شارەکان، یان لیستەکان...",
+    "accommodations": "نیشتەجێبوون",
+    "attractions": "شوێنە سەرنجڕاکێشەکان",
+    "tours": "گەشت",
+    "parties": "بەزمەکان",
+    "festivals": "جەژنەکان",
+    "restaurants": "چێشتخانەکان",
+    "events": "بۆنەکان",
+    "liveMusic": "مۆسیقای ڕاستەوخۆ",
+    "artCulture": "هونەر و کلتور",
+    "sports": "وەرزش",
+    "shopping": "کڕین",
+    "nightlife": "ژیانی شەوانە",
+    "beaches": "کەنارەکان",
+    "mountains": "چیاکان",
+    "nature": "سروشت",
+    "searchResults": "ئەنجامەکانی گەڕان بۆ \"{query}\"",
+    "typeInIraq": "{type} لە عێراق",
+    "exploreCity": "گەڕان لە {city}",
+    "allListings": "هەموو لیستەکان",
+    "listingFound": "{count} {count, plural, one {لیست} other {لیست}} دۆزرایەوە",
+    "noListingsFound": "هیچ لیستێک نەدۆزرایەوە",
+    "noListingsDescription": "هەوڵ بدە گەڕانەکەت بگۆڕیت یان هەموو لیستەکان بپشکنە.",
+    "noListingsAvailable": "هیچ لیستێک بەردەست نییە",
+    "noListingsAvailableDescription": "یەکەم کەس بە بۆ شوێنی نیشتەجێبوون، شوێنی سەرنجڕاکێش، یان گەشت هاوبەش بکەیت لەگەڵ گەشتیاران."
+  },
+  "cities": {
+    "baghdad": "بەغدا",
+    "erbil": "هەولێر",
+    "basra": "بەسرە",
+    "najaf": "نجف",
+    "mosul": "مووسڵ",
+    "sulaymaniyah": "سلێمانی",
+    "kurdistan": "کوردستان",
+    "karbala": "کەربەلا",
+    "kirkuk": "کەرکووک",
+    "nasiriyah": "ناسریە"
+  }
+}
+

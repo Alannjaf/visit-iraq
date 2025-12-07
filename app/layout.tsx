@@ -1,7 +1,5 @@
 import type { Metadata } from "next";
 import { Playfair_Display, Source_Sans_3 } from "next/font/google";
-import { StackProvider, StackTheme } from "@stackframe/stack";
-import { stackServerApp } from "@/stack";
 import "./globals.css";
 
 const playfair = Playfair_Display({
@@ -22,19 +20,17 @@ export const metadata: Metadata = {
   keywords: ["Iraq", "tourism", "travel", "Baghdad", "Babylon", "Mesopotamia", "tours", "attractions"],
 };
 
+// Root layout - Next.js requires html/body tags here
+// Locale-specific lang/dir are set via SetHtmlAttributes component
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
-    <html lang="en">
+    <html lang="en" dir="ltr">
       <body className={`${playfair.variable} ${sourceSans.variable} antialiased`}>
-        <StackProvider app={stackServerApp}>
-          <StackTheme>
-            {children}
-          </StackTheme>
-        </StackProvider>
+        {children}
       </body>
     </html>
   );

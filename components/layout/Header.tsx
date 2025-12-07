@@ -6,7 +6,9 @@ import { useUser, UserButton } from "@stackframe/stack";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter } from '@/i18n/routing';
+import { useTranslations } from 'next-intl';
+import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 
 interface HeaderProps {
   userRole?: "admin" | "host" | "user" | null;
@@ -15,6 +17,7 @@ interface HeaderProps {
 export function Header({ userRole }: HeaderProps) {
   const user = useUser();
   const router = useRouter();
+  const t = useTranslations();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [upgrading, setUpgrading] = useState(false);
@@ -61,6 +64,7 @@ export function Header({ userRole }: HeaderProps) {
 
           {/* Auth Section */}
           <div className="hidden md:flex items-center gap-4">
+            <LanguageSwitcher />
             {user ? (
               <div className="flex items-center gap-4">
                 {userRole === "user" && (
@@ -69,26 +73,26 @@ export function Header({ userRole }: HeaderProps) {
                     size="sm"
                     onClick={handleBecomeHostClick}
                   >
-                    Become a Host
+                    {t('common.becomeHost')}
                   </Button>
                 )}
                 {userRole === "admin" && (
                   <Link href="/admin">
                     <Button variant="ghost" size="sm">
-                      Admin Panel
+                      {t('common.adminPanel')}
                     </Button>
                   </Link>
                 )}
                 {(userRole === "host" || userRole === "admin") && (
                   <Link href="/host">
                     <Button variant="ghost" size="sm">
-                      Host Dashboard
+                      {t('common.hostDashboard')}
                     </Button>
                   </Link>
                 )}
                 <Link href="/dashboard">
                   <Button variant="ghost" size="sm">
-                    Dashboard
+                    {t('common.dashboard')}
                   </Button>
                 </Link>
                 <UserButton />
@@ -97,12 +101,12 @@ export function Header({ userRole }: HeaderProps) {
               <div className="flex items-center gap-3">
                 <Link href="/handler/sign-in">
                   <Button variant="ghost" size="sm">
-                    Sign In
+                    {t('common.signIn')}
                   </Button>
                 </Link>
                 <Link href="/handler/sign-up">
                   <Button variant="primary" size="sm">
-                    Sign Up
+                    {t('common.signUp')}
                   </Button>
                 </Link>
               </div>
@@ -143,6 +147,9 @@ export function Header({ userRole }: HeaderProps) {
         {mobileMenuOpen && (
           <div className="md:hidden py-4 border-t border-border">
             <nav className="flex flex-col gap-2">
+              <div className="px-4 pb-2">
+                <LanguageSwitcher />
+              </div>
               {user ? (
                 <>
                   {userRole === "user" && (
@@ -150,7 +157,7 @@ export function Header({ userRole }: HeaderProps) {
                       onClick={handleBecomeHostClick}
                       className="px-4 py-2 text-center bg-secondary text-white rounded-lg font-medium hover:bg-secondary-dark transition-colors"
                     >
-                      Become a Host
+                      {t('common.becomeHost')}
                     </button>
                   )}
                   {userRole === "admin" && (
@@ -158,7 +165,7 @@ export function Header({ userRole }: HeaderProps) {
                       href="/admin"
                       className="px-4 py-2 text-foreground-muted hover:text-primary hover:bg-background-alt rounded-lg font-medium transition-colors"
                     >
-                      Admin Panel
+                      {t('common.adminPanel')}
                     </Link>
                   )}
                   {(userRole === "host" || userRole === "admin") && (
@@ -166,14 +173,14 @@ export function Header({ userRole }: HeaderProps) {
                       href="/host"
                       className="px-4 py-2 text-foreground-muted hover:text-primary hover:bg-background-alt rounded-lg font-medium transition-colors"
                     >
-                      Host Dashboard
+                      {t('common.hostDashboard')}
                     </Link>
                   )}
                   <Link
                     href="/dashboard"
                     className="px-4 py-2 text-foreground-muted hover:text-primary hover:bg-background-alt rounded-lg font-medium transition-colors"
                   >
-                    Dashboard
+                    {t('common.dashboard')}
                   </Link>
                 </>
               ) : (
@@ -182,13 +189,13 @@ export function Header({ userRole }: HeaderProps) {
                     href="/handler/sign-in"
                     className="px-4 py-2 text-foreground-muted hover:text-primary hover:bg-background-alt rounded-lg font-medium transition-colors"
                   >
-                    Sign In
+                    {t('common.signIn')}
                   </Link>
                   <Link
                     href="/handler/sign-up"
                     className="px-4 py-2 text-center bg-primary text-white rounded-lg font-medium"
                   >
-                    Sign Up
+                    {t('common.signUp')}
                   </Link>
                 </>
               )}
@@ -201,7 +208,7 @@ export function Header({ userRole }: HeaderProps) {
       <Modal
         isOpen={showConfirmModal}
         onClose={() => !upgrading && setShowConfirmModal(false)}
-        title="Become a Host"
+        title={t('header.becomeHostTitle')}
         size="lg"
       >
         <div className="space-y-6">
@@ -227,32 +234,26 @@ export function Header({ userRole }: HeaderProps) {
           {/* Information */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-foreground text-center">
-              Ready to share your place with travelers?
+              {t('header.becomeHostDescription')}
             </h3>
 
             <div className="space-y-3 text-foreground-muted">
-              <p className="text-sm">As a host on Visit Iraq, you can:</p>
+              <p className="text-sm">{t('header.becomeHostInfo')}</p>
 
               <ul className="space-y-2 text-sm list-disc list-inside">
-                <li>
-                  Create and manage listings for accommodations, attractions, or
-                  tours
-                </li>
-                <li>Share your space with travelers from around the world</li>
-                <li>Help visitors discover the beauty and heritage of Iraq</li>
-                <li>Set your own pricing and availability</li>
-                <li>Receive inquiries directly from interested travelers</li>
+                <li>{t('header.becomeHostFeature1')}</li>
+                <li>{t('header.becomeHostFeature2')}</li>
+                <li>{t('header.becomeHostFeature3')}</li>
+                <li>{t('header.becomeHostFeature4')}</li>
+                <li>{t('header.becomeHostFeature5')}</li>
               </ul>
 
               <div className="mt-4 p-4 bg-background-alt rounded-lg">
                 <p className="text-sm font-medium text-foreground mb-2">
-                  What happens next?
+                  {t('header.whatHappensNext')}
                 </p>
                 <p className="text-sm text-foreground-muted">
-                  After upgrading, you&apos;ll be redirected to your Host
-                  Dashboard where you can create your first listing. All
-                  listings are reviewed by our admin team before being published
-                  to ensure quality.
+                  {t('header.whatHappensNextDescription')}
                 </p>
               </div>
             </div>
@@ -266,7 +267,7 @@ export function Header({ userRole }: HeaderProps) {
               disabled={upgrading}
               className="flex-1"
             >
-              Cancel
+              {t('common.cancel')}
             </Button>
             <Button
               variant="secondary"
@@ -274,7 +275,7 @@ export function Header({ userRole }: HeaderProps) {
               isLoading={upgrading}
               className="flex-1"
             >
-              Yes, Become a Host
+              {t('header.yesBecomeHost')}
             </Button>
           </div>
         </div>

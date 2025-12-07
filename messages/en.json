@@ -1,0 +1,73 @@
+{
+  "common": {
+    "signIn": "Sign In",
+    "signUp": "Sign Up",
+    "dashboard": "Dashboard",
+    "adminPanel": "Admin Panel",
+    "hostDashboard": "Host Dashboard",
+    "becomeHost": "Become a Host",
+    "cancel": "Cancel",
+    "clearFilters": "Clear filters",
+    "allCities": "All Cities",
+    "search": "Search",
+    "viewAllListings": "View All Listings"
+  },
+  "header": {
+    "becomeHostTitle": "Become a Host",
+    "becomeHostDescription": "Ready to share your place with travelers?",
+    "becomeHostInfo": "As a host on Visit Iraq, you can:",
+    "becomeHostFeature1": "Create and manage listings for accommodations, attractions, or tours",
+    "becomeHostFeature2": "Share your space with travelers from around the world",
+    "becomeHostFeature3": "Help visitors discover the beauty and heritage of Iraq",
+    "becomeHostFeature4": "Set your own pricing and availability",
+    "becomeHostFeature5": "Receive inquiries directly from interested travelers",
+    "whatHappensNext": "What happens next?",
+    "whatHappensNextDescription": "After upgrading, you'll be redirected to your Host Dashboard where you can create your first listing. All listings are reviewed by our admin team before being published to ensure quality.",
+    "yesBecomeHost": "Yes, Become a Host"
+  },
+  "footer": {
+    "copyright": "© {year} Visit Iraq. All rights reserved.",
+    "privacyPolicy": "Privacy Policy",
+    "termsOfService": "Terms of Service"
+  },
+  "home": {
+    "searchPlaceholder": "Search destinations, cities, or listings...",
+    "accommodations": "Accommodations",
+    "attractions": "Attractions",
+    "tours": "Tours",
+    "parties": "Parties",
+    "festivals": "Festivals",
+    "restaurants": "Restaurants",
+    "events": "Events",
+    "liveMusic": "Live Music",
+    "artCulture": "Art & Culture",
+    "sports": "Sports",
+    "shopping": "Shopping",
+    "nightlife": "Nightlife",
+    "beaches": "Beaches",
+    "mountains": "Mountains",
+    "nature": "Nature",
+    "searchResults": "Search results for \"{query}\"",
+    "typeInIraq": "{type}s in Iraq",
+    "exploreCity": "Explore {city}",
+    "allListings": "All Listings",
+    "listingFound": "{count} {count, plural, one {listing} other {listings}} found",
+    "noListingsFound": "No listings found",
+    "noListingsDescription": "Try adjusting your search or browse all listings.",
+    "noListingsAvailable": "No listings available yet",
+    "noListingsAvailableDescription": "Be the first to share your accommodation, attraction, or tour with travelers."
+  },
+  "cities": {
+    "baghdad": "Baghdad",
+    "erbil": "Erbil",
+    "basra": "Basra",
+    "najaf": "Najaf",
+    "mosul": "Mosul",
+    "sulaymaniyah": "Sulaymaniyah",
+    "kurdistan": "Kurdistan",
+    "karbala": "Karbala",
+    "kirkuk": "Kirkuk",
+    "nasiriyah": "Nasiriyah"
+  }
+}
+

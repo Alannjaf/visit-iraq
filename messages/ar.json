@@ -1,0 +1,73 @@
+{
+  "common": {
+    "signIn": "تسجيل الدخول",
+    "signUp": "إنشاء حساب",
+    "dashboard": "لوحة التحكم",
+    "adminPanel": "لوحة الإدارة",
+    "hostDashboard": "لوحة تحكم المضيف",
+    "becomeHost": "كن مضيفاً",
+    "cancel": "إلغاء",
+    "clearFilters": "مسح المرشحات",
+    "allCities": "جميع المدن",
+    "search": "بحث",
+    "viewAllListings": "عرض جميع القوائم"
+  },
+  "header": {
+    "becomeHostTitle": "كن مضيفاً",
+    "becomeHostDescription": "هل أنت مستعد لمشاركة مكانك مع المسافرين؟",
+    "becomeHostInfo": "كمضيف في Visit Iraq، يمكنك:",
+    "becomeHostFeature1": "إنشاء وإدارة قوائم للإقامة والمعالم السياحية أو الجولات",
+    "becomeHostFeature2": "مشاركة مكانك مع المسافرين من جميع أنحاء العالم",
+    "becomeHostFeature3": "مساعدة الزوار على اكتشاف جمال وتراث العراق",
+    "becomeHostFeature4": "تحديد أسعارك وتوفرك",
+    "becomeHostFeature5": "تلقي الاستفسارات مباشرة من المسافرين المهتمين",
+    "whatHappensNext": "ماذا يحدث بعد ذلك؟",
+    "whatHappensNextDescription": "بعد الترقية، سيتم إعادة توجيهك إلى لوحة تحكم المضيف حيث يمكنك إنشاء قائمتك الأولى. يتم مراجعة جميع القوائم من قبل فريق الإدارة لدينا قبل النشر لضمان الجودة.",
+    "yesBecomeHost": "نعم، كن مضيفاً"
+  },
+  "footer": {
+    "copyright": "© {year} Visit Iraq. جميع الحقوق محفوظة.",
+    "privacyPolicy": "سياسة الخصوصية",
+    "termsOfService": "شروط الخدمة"
+  },
+  "home": {
+    "searchPlaceholder": "ابحث عن الوجهات أو المدن أو القوائم...",
+    "accommodations": "الإقامة",
+    "attractions": "المعالم السياحية",
+    "tours": "الجولات",
+    "parties": "الحفلات",
+    "festivals": "المهرجانات",
+    "restaurants": "المطاعم",
+    "events": "الفعاليات",
+    "liveMusic": "الموسيقى الحية",
+    "artCulture": "الفن والثقافة",
+    "sports": "الرياضة",
+    "shopping": "التسوق",
+    "nightlife": "الحياة الليلية",
+    "beaches": "الشواطئ",
+    "mountains": "الجبال",
+    "nature": "الطبيعة",
+    "searchResults": "نتائج البحث عن \"{query}\"",
+    "typeInIraq": "{type} في العراق",
+    "exploreCity": "استكشف {city}",
+    "allListings": "جميع القوائم",
+    "listingFound": "تم العثور على {count} {count, plural, one {قائمة} other {قائمة}}",
+    "noListingsFound": "لم يتم العثور على قوائم",
+    "noListingsDescription": "حاول تعديل بحثك أو تصفح جميع القوائم.",
+    "noListingsAvailable": "لا توجد قوائم متاحة بعد",
+    "noListingsAvailableDescription": "كن أول من يشارك إقامته أو معلمه السياحي أو جولته مع المسافرين."
+  },
+  "cities": {
+    "baghdad": "بغداد",
+    "erbil": "أربيل",
+    "basra": "البصرة",
+    "najaf": "النجف",
+    "mosul": "الموصل",
+    "sulaymaniyah": "السليمانية",
+    "kurdistan": "كردستان",
+    "karbala": "كربلاء",
+    "kirkuk": "كركوك",
+    "nasiriyah": "الناصرية"
+  }
+}
+

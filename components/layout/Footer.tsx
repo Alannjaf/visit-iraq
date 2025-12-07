@@ -1,6 +1,11 @@
+"use client";
+
 import Link from "next/link";
+import { useTranslations } from 'next-intl';
 
 export function Footer() {
+  const t = useTranslations();
+  
   return (
     <footer className="bg-[var(--primary)] text-white">
       {/* Decorative Pattern */}
@@ -11,14 +16,14 @@ export function Footer() {
         <div className="pt-4 border-t border-white/10">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <p className="text-white/50 text-sm">
-              © {new Date().getFullYear()} Visit Iraq. All rights reserved.
+              {t('footer.copyright', { year: new Date().getFullYear() })}
             </p>
             <div className="flex items-center gap-6">
               <Link href="/privacy" className="text-white/50 hover:text-white text-sm transition-colors">
-                Privacy Policy
+                {t('footer.privacyPolicy')}
               </Link>
               <Link href="/terms" className="text-white/50 hover:text-white text-sm transition-colors">
-                Terms of Service
+                {t('footer.termsOfService')}
               </Link>
             </div>
           </div>

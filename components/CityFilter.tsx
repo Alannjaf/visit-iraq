@@ -1,26 +1,30 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useState } from "react";
-
-const popularCities = [
-  "Baghdad",
-  "Erbil",
-  "Basra",
-  "Najaf",
-  "Mosul",
-  "Sulaymaniyah",
-  "Kurdistan",
-  "Karbala",
-  "Kirkuk",
-  "Nasiriyah",
-];
+import { useTranslations } from 'next-intl';
+import { useRouter } from '@/i18n/routing';
 
 export function CityFilter() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const t = useTranslations();
   const [isOpen, setIsOpen] = useState(false);
   const selectedCity = searchParams.get("city") || "";
+
+  // City codes (for URL) mapped to translation keys
+  const popularCities = [
+    { code: "Baghdad", key: "cities.baghdad" },
+    { code: "Erbil", key: "cities.erbil" },
+    { code: "Basra", key: "cities.basra" },
+    { code: "Najaf", key: "cities.najaf" },
+    { code: "Mosul", key: "cities.mosul" },
+    { code: "Sulaymaniyah", key: "cities.sulaymaniyah" },
+    { code: "Kurdistan", key: "cities.kurdistan" },
+    { code: "Karbala", key: "cities.karbala" },
+    { code: "Kirkuk", key: "cities.kirkuk" },
+    { code: "Nasiriyah", key: "cities.nasiriyah" },
+  ];
 
   const handleCityChange = (city: string) => {
     const params = new URLSearchParams();
@@ -47,7 +51,11 @@ export function CityFilter() {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
         </svg>
         <span className="text-sm font-medium text-gray-700">
-          {selectedCity || "All Cities"}
+          {selectedCity 
+            ? popularCities.find(c => c.code === selectedCity)?.key 
+              ? t(popularCities.find(c => c.code === selectedCity)!.key as any)
+              : selectedCity
+            : t('common.allCities')}
         </span>
         <svg 
           className={`w-4 h-4 text-gray-600 transition-transform ${isOpen ? "rotate-180" : ""}`}
@@ -75,21 +83,21 @@ export function CityFilter() {
                     : "hover:bg-gray-100 text-gray-700"
                 }`}
               >
-                All Cities
+                {t('common.allCities')}
               </button>
               <div className="border-t border-gray-200 my-2" />
               <div className="space-y-1">
                 {popularCities.map((city) => (
                   <button
-                    key={city}
-                    onClick={() => handleCityChange(city)}
+                    key={city.code}
+                    onClick={() => handleCityChange(city.code)}
                     className={`w-full text-left px-3 py-2 rounded-md text-sm transition-colors ${
-                      selectedCity === city
+                      selectedCity === city.code
                         ? "bg-[var(--primary)] text-white"
                         : "hover:bg-gray-100 text-gray-700"
                     }`}
                   >
-                    {city}
+                    {t(city.key as any)}
                   </button>
                 ))}
               </div>

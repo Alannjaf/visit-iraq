@@ -1,13 +1,15 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
-import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { useTranslations } from 'next-intl';
+import { useRouter } from '@/i18n/routing';
 
 export function SearchBar() {
   const [searchQuery, setSearchQuery] = useState("");
   const router = useRouter();
   const searchParams = useSearchParams();
+  const t = useTranslations();
   
   // Initialize search query from URL params
   useEffect(() => {
@@ -39,7 +41,7 @@ export function SearchBar() {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search destinations, cities, or listings..."
+            placeholder={t('home.searchPlaceholder')}
             className="w-full text-sm text-gray-900 placeholder-gray-500 outline-none bg-transparent"
           />
         </div>
