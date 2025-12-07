@@ -29,13 +29,25 @@ export default async function ListingDetailPage({
 
   const isAuthenticated = !!user;
 
-  const defaultImages = {
+  const defaultImages: Record<string, string> = {
     accommodation: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&h=600&fit=crop",
     attraction: "https://images.unsplash.com/photo-1539650116574-8efeb43e2750?w=800&h=600&fit=crop",
     tour: "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=800&h=600&fit=crop",
+    party: "https://images.unsplash.com/photo-1511578314322-379afb476865?w=800&h=600&fit=crop",
+    festival: "https://images.unsplash.com/photo-1478147427282-58a87a120781?w=800&h=600&fit=crop",
+    restaurant: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&h=600&fit=crop",
+    event: "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=800&h=600&fit=crop",
+    live_music: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=800&h=600&fit=crop",
+    art_culture: "https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=800&h=600&fit=crop",
+    sport: "https://images.unsplash.com/photo-1576678927484-cc907957088c?w=800&h=600&fit=crop",
+    shopping: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&h=600&fit=crop",
+    nightlife: "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=800&h=600&fit=crop",
+    beach: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&h=600&fit=crop",
+    mountain: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&h=600&fit=crop",
+    nature: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=800&h=600&fit=crop",
   };
 
-  const mainImage = listing.thumbnail || listing.images?.[0] || defaultImages[listing.type];
+  const mainImage = listing.thumbnail || listing.images?.[0] || defaultImages[listing.type] || defaultImages.accommodation;
 
   return (
     <div className="min-h-screen flex flex-col">

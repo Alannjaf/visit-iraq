@@ -5,16 +5,7 @@ import { useTranslations } from 'next-intl';
 import { Button } from "@/components/ui";
 import { ListingCard } from "@/components/listings/ListingCard";
 import { CategoryScroll } from "@/components/CategoryScroll";
-
-interface Listing {
-  id: string;
-  title: string;
-  description: string;
-  type: string;
-  city: string;
-  images: string[];
-  [key: string]: any;
-}
+import type { Listing } from "@/lib/db";
 
 interface HomePageContentProps {
   listings: Listing[];
