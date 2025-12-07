@@ -5,6 +5,7 @@ import { getMessages } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 import { routing } from '@/i18n/routing';
 import { SetHtmlAttributes } from '@/components/SetHtmlAttributes';
+import { ensureUserRole } from '@/lib/auth';
 
 export default async function LocaleLayout({
   children,
@@ -18,6 +19,18 @@ export default async function LocaleLayout({
   // Ensure that the incoming `locale` is valid
   if (!routing.locales.includes(locale as any)) {
     notFound();
+  }
+
+  // Initialize user in database if they're authenticated
+  // This ensures users created in Stack Auth are also created in Neon DB
+  try {
+    const user = await stackServerApp.getUser();
+    if (user) {
+      await ensureUserRole(user.id, 'user');
+    }
+  } catch (error) {
+    // Silently fail if user is not authenticated or if there's an error
+    // This is expected for unauthenticated users
   }
 
   // Providing all messages to the client

@@ -1,5 +1,5 @@
 import { stackServerApp } from '@/stack';
-import { getUserRole, setUserRole, isUserSuspended, type UserRole } from './db';
+import { getUserRole, setUserRole, isUserSuspended, sql, type UserRole } from './db';
 
 // Check if the current request is from an admin using env credentials
 export function isEnvAdmin(email: string, password: string): boolean {
@@ -36,11 +36,19 @@ export async function getCurrentUserWithRole() {
 
 // Ensure a user has a role in the database (called on first login)
 export async function ensureUserRole(userId: string, defaultRole: UserRole = 'user') {
-  const existingRole = await getUserRole(userId);
-  if (!existingRole || existingRole === 'user') {
+  // Check if user actually exists in database
+  const result = await sql`
+    SELECT role FROM user_roles WHERE user_id = ${userId}
+  `;
+  
+  // If user doesn't exist, create them with default role
+  if (!result || result.length === 0) {
     await setUserRole(userId, defaultRole);
+    return defaultRole;
   }
-  return existingRole || defaultRole;
+  
+  // User exists, return their role
+  return (result[0]?.role as UserRole) || defaultRole;
 }
 
 // Check if current user is an admin
