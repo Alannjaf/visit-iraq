@@ -10,10 +10,19 @@ export function middleware(request: NextRequest) {
 
   // Redirect locale-prefixed handler routes to non-locale handler routes
   // e.g., /en/handler/sign-in -> /handler/sign-in
-  const localeMatch = pathname.match(/^\/(en|kurdish|ar)\/handler\/(.+)$/);
-  if (localeMatch) {
-    const [, , handlerPath] = localeMatch;
+  const handlerLocaleMatch = pathname.match(/^\/(en|kurdish|ar)\/handler\/(.+)$/);
+  if (handlerLocaleMatch) {
+    const [, , handlerPath] = handlerLocaleMatch;
     const redirectUrl = new URL(`/handler/${handlerPath}${request.nextUrl.search}`, request.url);
+    return NextResponse.redirect(redirectUrl);
+  }
+
+  // Redirect locale-prefixed admin routes to non-locale admin routes
+  // e.g., /en/admin/login -> /admin/login
+  const adminLocaleMatch = pathname.match(/^\/(en|kurdish|ar)\/admin\/(.+)$/);
+  if (adminLocaleMatch) {
+    const [, , adminPath] = adminLocaleMatch;
+    const redirectUrl = new URL(`/admin/${adminPath}${request.nextUrl.search}`, request.url);
     return NextResponse.redirect(redirectUrl);
   }
 
@@ -22,16 +31,16 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // Handle admin routes - check session before locale routing
-  if (pathname.startsWith('/admin') && !pathname.startsWith('/admin/login')) {
-    const hasAdminSession = request.cookies.get('admin-session')?.value === 'true';
-    if (!hasAdminSession) {
-      // Preserve locale in redirect if present
-      const locale = pathname.split('/')[1];
-      const isLocale = ['en', 'kurdish', 'ar'].includes(locale);
-      const adminPath = isLocale ? `/${locale}/admin/login` : '/admin/login';
-      return NextResponse.redirect(new URL(adminPath, request.url));
+  // Skip locale routing for admin routes (admin panel should not be localized)
+  if (pathname.startsWith('/admin')) {
+    // Check admin session for protected admin routes
+    if (!pathname.startsWith('/admin/login')) {
+      const hasAdminSession = request.cookies.get('admin-session')?.value === 'true';
+      if (!hasAdminSession) {
+        return NextResponse.redirect(new URL('/admin/login', request.url));
+      }
     }
+    return NextResponse.next();
   }
 
   // Apply next-intl middleware for locale routing
