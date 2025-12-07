@@ -38,17 +38,48 @@ export async function getCurrentUserWithRole() {
 export async function ensureUserRole(userId: string, defaultRole: UserRole = 'user') {
   // Check if user actually exists in database
   const result = await sql`
-    SELECT role FROM user_roles WHERE user_id = ${userId}
+    SELECT role, email, display_name FROM user_roles WHERE user_id = ${userId}
   `;
   
   // If user doesn't exist, create them with default role
   if (!result || result.length === 0) {
-    await setUserRole(userId, defaultRole);
+    // Try to get user details from Stack Auth if available
+    let email: string | null = null;
+    let displayName: string | null = null;
+    
+    try {
+      const currentUser = await stackServerApp.getUser();
+      if (currentUser && currentUser.id === userId) {
+        email = currentUser.primaryEmail || null;
+        displayName = currentUser.displayName || null;
+      }
+    } catch (error) {
+      // User might not be authenticated in this context, that's okay
+    }
+    
+    await setUserRole(userId, defaultRole, email, displayName);
     return defaultRole;
   }
   
+  // User exists - update email/display_name if they're missing and we have current user data
+  const existingUser = result[0] as { role: UserRole; email: string | null; display_name: string | null };
+  if ((!existingUser.email || !existingUser.display_name)) {
+    try {
+      const currentUser = await stackServerApp.getUser();
+      if (currentUser && currentUser.id === userId) {
+        const emailToUpdate = existingUser.email || currentUser.primaryEmail || null;
+        const displayNameToUpdate = existingUser.display_name || currentUser.displayName || null;
+        if (emailToUpdate || displayNameToUpdate) {
+          await setUserRole(userId, existingUser.role, emailToUpdate, displayNameToUpdate);
+        }
+      }
+    } catch (error) {
+      // Silently fail - user details will be updated on next login
+    }
+  }
+  
   // User exists, return their role
-  return (result[0]?.role as UserRole) || defaultRole;
+  return existingUser.role;
 }
 
 // Check if current user is an admin

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { stackServerApp } from "@/stack";
-import { getAllUsers, getUsersByRole, getUserRole, sql, type UserRole } from "@/lib/db";
+import { getAllUsers, getUsersByRole, getUserRole, getUserDetailsFromStack, type UserRole } from "@/lib/db";
 
 // GET /api/admin/users - Get all users (admin only)
 export async function GET(request: NextRequest) {
@@ -43,31 +43,31 @@ export async function GET(request: NextRequest) {
       ? await getUsersByRole(roleFilter)
       : await getAllUsers();
 
-    // Fetch user details from neon_auth.users_sync table
+    // Fetch user details - user_roles now has email/display_name, but we'll enhance with sync table data if available
     const usersWithDetails = await Promise.all(
       userRoles.map(async (userRole) => {
-        let email = "No email";
-        let displayName: string | null = null;
+        // userRole already has email and display_name from the query
+        // But let's try to enhance it with sync table data if user_roles data is missing
+        let email = userRole.email || "No email";
+        let displayName = userRole.display_name || null;
         
-        try {
-          // Query neon_auth.users_sync table (Stack Auth sync table)
-          const userDetails = await sql`
-            SELECT 
-              id,
-              email,
-              name
-            FROM neon_auth.users_sync
-            WHERE id = ${userRole.user_id}
-            LIMIT 1
-          `;
-          
-          if (userDetails && Array.isArray(userDetails) && userDetails.length > 0) {
-            const user = userDetails[0] as { id: string; email: string | null; name: string | null };
-            email = user.email || "No email";
-            displayName = user.name || null;
+        // If we don't have email/display_name in user_roles, try sync table
+        if (!userRole.email || !userRole.display_name) {
+          const userDetails = await getUserDetailsFromStack(userRole.user_id);
+          if (userDetails) {
+            email = userDetails.email || email;
+            displayName = userDetails.displayName || displayName;
+            
+            // Update user_roles with the found data for future use
+            if (userDetails.email || userDetails.displayName) {
+              try {
+                const { setUserRole } = await import('@/lib/db');
+                await setUserRole(userRole.user_id, userRole.role, userDetails.email || null, userDetails.displayName || null);
+              } catch (error) {
+                // Silently fail - will update on next check
+              }
+            }
           }
-        } catch (error: any) {
-          console.error(`Error fetching user details for ${userRole.user_id}:`, error?.message || error);
         }
         
         return {

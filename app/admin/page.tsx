@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { getAllListings, getPendingListings, getAllUsers, getUsersByRole, sql } from "@/lib/db";
+import { getAllListings, getPendingListings, getAllUsers, getUsersByRole, getUserDetailsFromStack } from "@/lib/db";
 import { getListingTypeEmoji } from "@/lib/utils";
 
 export default async function AdminDashboard() {
@@ -20,27 +20,20 @@ export default async function AdminDashboard() {
     getUsersByRole("host"),
   ]);
 
-  // Fetch user details from neon_auth.users_sync table
+  // Fetch user details - user_roles now has email/display_name
   const allUsers = await Promise.all(
     allUsersRaw.map(async (userRole) => {
-      let email = "Unknown";
-      let displayName: string | null = null;
+      // userRole already has email and display_name from the query
+      let email = userRole.email || "Unknown";
+      let displayName = userRole.display_name || null;
       
-      try {
-        const userDetails = await sql`
-          SELECT id, email, name
-          FROM neon_auth.users_sync
-          WHERE id = ${userRole.user_id}
-          LIMIT 1
-        `;
-        
-        if (userDetails && Array.isArray(userDetails) && userDetails.length > 0) {
-          const user = userDetails[0] as { id: string; email: string | null; name: string | null };
-          email = user.email || "Unknown";
-          displayName = user.name || null;
+      // If we don't have email/display_name in user_roles, try sync table
+      if (!userRole.email || !userRole.display_name) {
+        const userDetails = await getUserDetailsFromStack(userRole.user_id);
+        if (userDetails) {
+          email = userDetails.email || email;
+          displayName = userDetails.displayName || displayName;
         }
-      } catch (error) {
-        console.error(`Error fetching user details for ${userRole.user_id}:`, error);
       }
       
       return {

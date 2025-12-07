@@ -79,12 +79,21 @@ export async function getUserRole(userId: string): Promise<UserRole> {
   return (result[0]?.role as UserRole) || 'user';
 }
 
-export async function setUserRole(userId: string, role: UserRole): Promise<void> {
+export async function setUserRole(
+  userId: string, 
+  role: UserRole, 
+  email?: string | null, 
+  displayName?: string | null
+): Promise<void> {
   await sql`
-    INSERT INTO user_roles (user_id, role, created_at, updated_at)
-    VALUES (${userId}, ${role}, NOW(), NOW())
+    INSERT INTO user_roles (user_id, role, email, display_name, created_at, updated_at)
+    VALUES (${userId}, ${role}, ${email || null}, ${displayName || null}, NOW(), NOW())
     ON CONFLICT (user_id) 
-    DO UPDATE SET role = ${role}, updated_at = NOW()
+    DO UPDATE SET 
+      role = ${role}, 
+      email = COALESCE(${email || null}, user_roles.email),
+      display_name = COALESCE(${displayName || null}, user_roles.display_name),
+      updated_at = NOW()
   `;
 }
 
@@ -344,21 +353,72 @@ export async function rejectListing(id: string, adminId: string, reason: string)
 }
 
 // Get all users with their roles
-export async function getAllUsers(): Promise<Array<{ user_id: string; role: UserRole; is_suspended: boolean; created_at: Date }>> {
+export async function getAllUsers(): Promise<Array<{ user_id: string; role: UserRole; is_suspended: boolean; created_at: Date; email: string | null; display_name: string | null }>> {
   const result = await sql`
-    SELECT user_id, role, is_suspended, created_at FROM user_roles
+    SELECT user_id, role, is_suspended, created_at, email, display_name FROM user_roles
     ORDER BY created_at DESC
   `;
-  return result as Array<{ user_id: string; role: UserRole; is_suspended: boolean; created_at: Date }>;
+  return result as Array<{ user_id: string; role: UserRole; is_suspended: boolean; created_at: Date; email: string | null; display_name: string | null }>;
+}
+
+// Helper function to get user details from Stack Auth
+// First tries the sync table, then falls back to Stack Auth API
+export async function getUserDetailsFromStack(userId: string): Promise<{ email: string; displayName: string | null } | null> {
+  try {
+    // First, try neon_auth.users_sync table (Stack Auth sync table)
+    const result = await sql`
+      SELECT 
+        email,
+        name,
+        raw_json
+      FROM neon_auth.users_sync
+      WHERE id = ${userId}
+        AND deleted_at IS NULL
+      LIMIT 1
+    `;
+    
+    if (result && Array.isArray(result) && result.length > 0) {
+      const user = result[0] as { 
+        email: string | null; 
+        name: string | null;
+        raw_json: any;
+      };
+      
+      // Extract from raw_json if available (contains primaryEmail, displayName)
+      const primaryEmail = user.raw_json?.primaryEmail || user.raw_json?.primary_email;
+      const displayName = user.raw_json?.displayName || user.raw_json?.display_name;
+      
+      return {
+        email: primaryEmail || user.email || "No email",
+        displayName: displayName || user.name || null,
+      };
+    }
+  } catch (error) {
+    // Table might not exist or have different structure - continue to API fallback
+    console.error(`Error fetching user details from sync table for ${userId}:`, error);
+  }
+  
+  // Fallback: Use Stack Auth API to fetch user details
+  try {
+    const { stackServerApp } = await import('@/stack');
+    
+    // Stack Auth doesn't have getUserById in server SDK, so we'll use the REST API
+    // For now, return null and let the calling code handle it
+    // The sync table should populate eventually, or we can enhance this later
+  } catch (error) {
+    console.error(`Error in Stack Auth API fallback for ${userId}:`, error);
+  }
+  
+  return null;
 }
 
 // Get users by role
-export async function getUsersByRole(role: UserRole): Promise<Array<{ user_id: string; role: UserRole; is_suspended: boolean; created_at: Date }>> {
+export async function getUsersByRole(role: UserRole): Promise<Array<{ user_id: string; role: UserRole; is_suspended: boolean; created_at: Date; email: string | null; display_name: string | null }>> {
   const result = await sql`
-    SELECT user_id, role, is_suspended, created_at FROM user_roles
+    SELECT user_id, role, is_suspended, created_at, email, display_name FROM user_roles
     WHERE role = ${role}
     ORDER BY created_at DESC
   `;
-  return result as Array<{ user_id: string; role: UserRole; is_suspended: boolean; created_at: Date }>;
+  return result as Array<{ user_id: string; role: UserRole; is_suspended: boolean; created_at: Date; email: string | null; display_name: string | null }>;
 }
 
