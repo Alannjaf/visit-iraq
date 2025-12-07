@@ -1,10 +1,68 @@
 import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { stackServerApp } from "@/stack";
-import { getUserRole, setUserRole, suspendUser, type UserRole } from "@/lib/db";
+import { getUserRole, setUserRole, suspendUser, getUserDetailsFromStack, type UserRole } from "@/lib/db";
 
 interface RouteParams {
   params: Promise<{ id: string }>;
+}
+
+// GET /api/admin/users/[id] - Get a single user's details (admin only)
+export async function GET(request: NextRequest, { params }: RouteParams) {
+  try {
+    const { id } = await params;
+    
+    // Check for admin session cookie (non-Stack Auth admin)
+    const cookieStore = await cookies();
+    const adminSession = cookieStore.get("admin-session")?.value === "true";
+    
+    let isAdmin = false;
+
+    if (adminSession) {
+      isAdmin = true;
+    } else {
+      // Check Stack Auth user
+      try {
+        const user = await stackServerApp.getUser();
+        if (user) {
+          const role = await getUserRole(user.id);
+          if (role === "admin") {
+            isAdmin = true;
+          }
+        }
+      } catch {
+        // User not authenticated via Stack Auth
+      }
+    }
+
+    if (!isAdmin) {
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 }
+      );
+    }
+
+    // Fetch user details
+    const userDetails = await getUserDetailsFromStack(id);
+    
+    if (!userDetails) {
+      return NextResponse.json(
+        { error: "User not found" },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({
+      email: userDetails.email,
+      displayName: userDetails.displayName,
+    });
+  } catch (error) {
+    console.error("Error fetching user details:", error);
+    return NextResponse.json(
+      { error: "Failed to fetch user details" },
+      { status: 500 }
+    );
+  }
 }
 
 // PATCH /api/admin/users/[id] - Update user role or suspension status
