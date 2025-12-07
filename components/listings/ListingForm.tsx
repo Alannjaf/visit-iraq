@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from 'next-intl';
 import { useRouter } from '@/i18n/routing';
 import { Button, Input, Select, Textarea } from "@/components/ui";
 import { 
@@ -19,6 +20,8 @@ interface ListingFormProps {
 
 export function ListingForm({ listing, mode }: ListingFormProps) {
   const router = useRouter();
+  const t = useTranslations('listingForm');
+  const tCommon = useTranslations('common');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [imagesVideosError, setImagesVideosError] = useState(false);
@@ -64,43 +67,43 @@ export function ListingForm({ listing, mode }: ListingFormProps) {
 
     // Validate required fields
     if (!formData.title.trim()) {
-      setError("Title is required");
+      setError(t('titleRequired'));
       setLoading(false);
       return;
     }
 
     if (!formData.description.trim()) {
-      setError("Description is required");
+      setError(t('descriptionRequired'));
       setLoading(false);
       return;
     }
 
     if (!formData.region) {
-      setError("Region is required");
+      setError(t('regionRequired'));
       setLoading(false);
       return;
     }
 
     if (!formData.city) {
-      setError("City is required");
+      setError(t('cityRequired'));
       setLoading(false);
       return;
     }
 
     if (!formData.location.trim()) {
-      setError("Location/Area is required");
+      setError(t('locationRequired'));
       setLoading(false);
       return;
     }
 
     if (!formData.full_address.trim()) {
-      setError("Full Address is required");
+      setError(t('fullAddressRequired'));
       setLoading(false);
       return;
     }
 
     if (formData.images.length === 0 && formData.videos.length === 0) {
-      setError("At least one image or video is required");
+      setError(t('mediaRequired'));
       setImagesVideosError(true);
       setLoading(false);
       return;
@@ -121,7 +124,7 @@ export function ListingForm({ listing, mode }: ListingFormProps) {
 
       if (!res.ok) {
         const data = await res.json();
-        throw new Error(data.error || "Failed to save listing");
+        throw new Error(data.error || t('failedToSave'));
       }
 
       router.push("/host");
@@ -269,10 +272,10 @@ export function ListingForm({ listing, mode }: ListingFormProps) {
 
       {/* Basic Info */}
       <div className="bg-white rounded-xl border border-[var(--border)] p-6">
-        <h2 className="text-lg font-bold text-[var(--foreground)] mb-6">Basic Information</h2>
+        <h2 className="text-lg font-bold text-[var(--foreground)] mb-6">{t('basicInformation')}</h2>
         <div className="space-y-6">
           <Select
-            label="Listing Type"
+            label={t('listingType')}
             value={formData.type}
             onChange={(e) => setFormData(prev => ({ 
               ...prev, 
@@ -280,51 +283,51 @@ export function ListingForm({ listing, mode }: ListingFormProps) {
               amenities: [], 
             }))}
             options={[
-              { value: "accommodation", label: "🏨 Accommodation (Hotel, Guesthouse, etc.)" },
-              { value: "attraction", label: "🏛️ Attraction (Museum, Historical Site, etc.)" },
-              { value: "tour", label: "🗺️ Tour (Guided Tour, Package, etc.)" },
-              { value: "party", label: "🎉 Party" },
-              { value: "festival", label: "🎪 Festival" },
-              { value: "restaurant", label: "🍽️ Restaurant" },
-              { value: "event", label: "🎭 Event" },
-              { value: "live_music", label: "🎵 Live Music" },
-              { value: "art_culture", label: "🎨 Art & Culture" },
-              { value: "sport", label: "🏃 Sports" },
-              { value: "shopping", label: "🛍️ Shopping" },
-              { value: "nightlife", label: "🌙 Nightlife" },
-              { value: "beach", label: "🏖️ Beach" },
-              { value: "mountain", label: "⛰️ Mountain" },
-              { value: "nature", label: "🏞️ Nature" },
+              { value: "accommodation", label: t('accommodationOption') },
+              { value: "attraction", label: t('attractionOption') },
+              { value: "tour", label: t('tourOption') },
+              { value: "party", label: t('partyOption') },
+              { value: "festival", label: t('festivalOption') },
+              { value: "restaurant", label: t('restaurantOption') },
+              { value: "event", label: t('eventOption') },
+              { value: "live_music", label: t('liveMusicOption') },
+              { value: "art_culture", label: t('artCultureOption') },
+              { value: "sport", label: t('sportOption') },
+              { value: "shopping", label: t('shoppingOption') },
+              { value: "nightlife", label: t('nightlifeOption') },
+              { value: "beach", label: t('beachOption') },
+              { value: "mountain", label: t('mountainOption') },
+              { value: "nature", label: t('natureOption') },
             ]}
           />
 
           <Input
-            label="Title *"
+            label={t('title')}
             value={formData.title}
             onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-            placeholder="e.g., Grand Hotel Baghdad, Ancient Babylon Tour"
+            placeholder={t('titlePlaceholder')}
             required
           />
 
           <Textarea
-            label="Description *"
+            label={t('description')}
             value={formData.description}
             onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-            placeholder="Describe your listing in detail..."
+            placeholder={t('descriptionPlaceholder')}
             rows={5}
             required
           />
 
           <Select
-            label="Price Range"
+            label={t('priceRange')}
             value={formData.price_range}
             onChange={(e) => setFormData(prev => ({ ...prev, price_range: e.target.value }))}
             options={[
-              { value: "free", label: "🆓 Free" },
-              { value: "budget", label: "$ Budget-friendly" },
-              { value: "moderate", label: "$$ Moderate" },
-              { value: "premium", label: "$$$ Premium" },
-              { value: "luxury", label: "$$$$ Luxury" },
+              { value: "free", label: t('free') },
+              { value: "budget", label: t('budget') },
+              { value: "moderate", label: t('moderate') },
+              { value: "premium", label: t('premium') },
+              { value: "luxury", label: t('luxury') },
             ]}
           />
         </div>
@@ -332,27 +335,27 @@ export function ListingForm({ listing, mode }: ListingFormProps) {
 
       {/* Location */}
       <div className="bg-white rounded-xl border border-[var(--border)] p-6">
-        <h2 className="text-lg font-bold text-[var(--foreground)] mb-6">Location</h2>
+        <h2 className="text-lg font-bold text-[var(--foreground)] mb-6">{t('location')}</h2>
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Select
-              label="Region *"
+              label={t('region')}
               value={formData.region}
               onChange={(e) => setFormData(prev => ({ 
                 ...prev, 
                 region: e.target.value,
                 city: "", 
               }))}
-              placeholder="Select region"
+              placeholder={t('selectRegion')}
               options={iraqiRegions.map(r => ({ value: r, label: r }))}
               required
             />
 
             <Select
-              label="City *"
+              label={t('city')}
               value={formData.city}
               onChange={(e) => setFormData(prev => ({ ...prev, city: e.target.value }))}
-              placeholder="Select city"
+              placeholder={t('selectCity')}
               options={availableCities.map(c => ({ value: c, label: c }))}
               disabled={!formData.region}
               required
@@ -360,18 +363,18 @@ export function ListingForm({ listing, mode }: ListingFormProps) {
           </div>
 
           <Input
-            label="Location/Area *"
+            label={t('locationArea')}
             value={formData.location}
             onChange={(e) => setFormData(prev => ({ ...prev, location: e.target.value }))}
-            placeholder="e.g., City Center, Near the Citadel"
+            placeholder={t('locationPlaceholder')}
             required
           />
 
           <Input
-            label="Full Address (shown to registered users) *"
+            label={t('fullAddress')}
             value={formData.full_address}
             onChange={(e) => setFormData(prev => ({ ...prev, full_address: e.target.value }))}
-            placeholder="Full street address"
+            placeholder={t('fullAddressPlaceholder')}
             required
           />
         </div>
@@ -379,35 +382,35 @@ export function ListingForm({ listing, mode }: ListingFormProps) {
 
       {/* Contact Info */}
       <div className="bg-white rounded-xl border border-[var(--border)] p-6">
-        <h2 className="text-lg font-bold text-[var(--foreground)] mb-6">Contact Information</h2>
+        <h2 className="text-lg font-bold text-[var(--foreground)] mb-6">{t('contactInformation')}</h2>
         <p className="text-sm text-[var(--foreground-muted)] mb-6">
-          This information will only be visible to registered users.
+          {t('contactInfoDescription')}
         </p>
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Input
-              label="Phone Number"
+              label={t('phoneNumber')}
               type="tel"
               value={formData.contact_phone}
               onChange={(e) => setFormData(prev => ({ ...prev, contact_phone: e.target.value }))}
-              placeholder="+964 xxx xxx xxxx"
+              placeholder={t('phonePlaceholder')}
             />
 
             <Input
-              label="Email"
+              label={t('email')}
               type="email"
               value={formData.contact_email}
               onChange={(e) => setFormData(prev => ({ ...prev, contact_email: e.target.value }))}
-              placeholder="contact@example.com"
+              placeholder={t('emailPlaceholder')}
             />
           </div>
 
           <Input
-            label="Website / Booking Link"
+            label={t('websiteLink')}
             type="url"
             value={formData.external_link}
             onChange={(e) => setFormData(prev => ({ ...prev, external_link: e.target.value }))}
-            placeholder="https://..."
+            placeholder={t('websitePlaceholder')}
           />
         </div>
       </div>
@@ -416,14 +419,14 @@ export function ListingForm({ listing, mode }: ListingFormProps) {
       <div className={`bg-white rounded-xl border p-6 ${imagesVideosError ? 'border-red-500 border-2' : 'border-[var(--border)]'}`}>
         <div className="mb-6">
           <h2 className="text-lg font-bold text-[var(--foreground)] mb-2">
-            Images & Videos <span className="text-red-500">*</span>
+            {t('imagesVideos')} <span className="text-red-500">{t('imagesVideosRequired')}</span>
           </h2>
           <p className="text-sm text-[var(--foreground-muted)]">
-            Add at least one image or video to showcase your listing. Select a thumbnail image to display on the homepage.
+            {t('imagesVideosDescription')}
           </p>
           {imagesVideosError && (
             <p className="text-sm text-red-600 mt-2 font-medium">
-              ⚠️ At least one image or video is required
+              {t('imagesVideosError')}
             </p>
           )}
         </div>
@@ -432,17 +435,17 @@ export function ListingForm({ listing, mode }: ListingFormProps) {
             <Input
               value={newMediaUrl}
               onChange={(e) => setNewMediaUrl(e.target.value)}
-              placeholder="Enter image or video URL"
+              placeholder={t('enterMediaUrl')}
               className="flex-1"
             />
             <Button type="button" variant="secondary" onClick={addMedia}>
-              Add Image/Video
+              {t('addImageVideo')}
             </Button>
           </div>
           
           {formData.images.length > 0 && (
             <div>
-              <h3 className="text-sm font-medium text-[var(--foreground-muted)] mb-2">Images</h3>
+              <h3 className="text-sm font-medium text-[var(--foreground-muted)] mb-2">{t('images')}</h3>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {formData.images.map((url, index) => (
                   <div key={index} className="relative group">
@@ -460,7 +463,7 @@ export function ListingForm({ listing, mode }: ListingFormProps) {
                     />
                     {formData.thumbnail === url && (
                       <div className="absolute top-2 left-2 bg-primary text-white text-xs px-2 py-1 rounded">
-                        Thumbnail
+                        {t('thumbnail')}
                       </div>
                     )}
                     <div className="absolute inset-0 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity bg-black/50 rounded-lg">
@@ -469,7 +472,7 @@ export function ListingForm({ listing, mode }: ListingFormProps) {
                         onClick={() => setFormData(prev => ({ ...prev, thumbnail: url }))}
                         className="px-3 py-1 bg-primary text-white text-xs rounded hover:bg-primary-light transition-colors"
                       >
-                        Set as Thumbnail
+                        {t('setAsThumbnail')}
                       </button>
                       <button
                         type="button"
@@ -487,9 +490,9 @@ export function ListingForm({ listing, mode }: ListingFormProps) {
 
           {formData.videos.length > 0 && (
             <div>
-              <h3 className="text-sm font-medium text-[var(--foreground-muted)] mb-2">Videos</h3>
+              <h3 className="text-sm font-medium text-[var(--foreground-muted)] mb-2">{t('videos')}</h3>
               <p className="text-xs text-[var(--foreground-muted)] mb-4">
-                Click "Set as Thumbnail" to use a video thumbnail as the listing thumbnail.
+                {t('videoThumbnailNote')}
               </p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {formData.videos.map((url, index) => {
@@ -516,7 +519,7 @@ export function ListingForm({ listing, mode }: ListingFormProps) {
                             />
                             {isThumbnail && (
                               <div className="absolute top-2 left-2 bg-primary text-white text-xs px-2 py-1 rounded z-10">
-                                Thumbnail
+                                {t('thumbnail')}
                               </div>
                             )}
                             <div className="absolute inset-0 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity bg-black/50 rounded-lg">
@@ -527,7 +530,7 @@ export function ListingForm({ listing, mode }: ListingFormProps) {
                                   isThumbnail ? "bg-primary-light" : "bg-primary"
                                 }`}
                               >
-                                {isThumbnail ? "Thumbnail Selected" : "Set as Thumbnail"}
+                                {isThumbnail ? t('thumbnailSelected') : t('setAsThumbnail')}
                               </button>
                             </div>
                           </>
@@ -558,7 +561,7 @@ export function ListingForm({ listing, mode }: ListingFormProps) {
                             )}
                             {isThumbnail && (
                               <div className="absolute top-2 left-2 bg-primary text-white text-xs px-2 py-1 rounded z-10">
-                                Thumbnail
+                                {t('thumbnail')}
                               </div>
                             )}
                           </>
@@ -589,7 +592,7 @@ export function ListingForm({ listing, mode }: ListingFormProps) {
       {/* Amenities/Features */}
       <div className="bg-white rounded-xl border border-[var(--border)] p-6">
         <h2 className="text-lg font-bold text-[var(--foreground)] mb-6">
-          {formData.type === "accommodation" ? "Amenities" : "Features"}
+          {formData.type === "accommodation" ? t('amenities') : t('features')}
         </h2>
         <div className="flex flex-wrap gap-3">
           {getAmenitiesList().map((amenity) => (
@@ -612,10 +615,10 @@ export function ListingForm({ listing, mode }: ListingFormProps) {
       {/* Submit */}
       <div className="flex gap-4">
         <Button type="submit" variant="primary" isLoading={loading}>
-          {mode === "create" ? "Submit for Review" : "Save Changes"}
+          {mode === "create" ? t('submitForReview') : t('saveChanges')}
         </Button>
         <Button type="button" variant="ghost" onClick={() => router.back()}>
-          Cancel
+          {tCommon('cancel')}
         </Button>
       </div>
     </form>

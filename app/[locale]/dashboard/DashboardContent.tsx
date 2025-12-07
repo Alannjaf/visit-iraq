@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from '@/i18n/routing';
 import { Link } from '@/i18n/routing';
+import { useTranslations } from 'next-intl';
 import { UserButton } from "@stackframe/stack";
 import { Header, Footer } from "@/components/layout";
 import { Button, Card, CardContent, Badge } from "@/components/ui";
@@ -19,6 +20,7 @@ interface DashboardContentProps {
 
 export function DashboardContent({ user, userRole: initialRole, showUpgrade }: DashboardContentProps) {
   const router = useRouter();
+  const t = useTranslations();
   const [userRole, setUserRole] = useState(initialRole);
   const [upgrading, setUpgrading] = useState(false);
 
@@ -55,7 +57,7 @@ export function DashboardContent({ user, userRole: initialRole, showUpgrade }: D
               </div>
               <div className="flex-1">
                 <h1 className="text-2xl font-bold text-[var(--foreground)]">
-                  Welcome, {user.displayName || "Traveler"}!
+                  {t('dashboard.welcome', { name: user.displayName || t('dashboard.traveler') })}
                 </h1>
                 <p className="text-[var(--foreground-muted)]">{user.primaryEmail}</p>
               </div>
@@ -67,7 +69,7 @@ export function DashboardContent({ user, userRole: initialRole, showUpgrade }: D
               </Badge>
               {userRole === "host" && (
                 <span className="text-sm text-[var(--foreground-muted)]">
-                  You can create and manage listings
+                  {t('dashboard.canCreateListings')}
                 </span>
               )}
             </div>
@@ -85,18 +87,17 @@ export function DashboardContent({ user, userRole: initialRole, showUpgrade }: D
                   </div>
                   <div className="flex-1">
                     <h2 className="text-xl font-bold text-[var(--foreground)] mb-2">
-                      Become a Host
+                      {t('dashboard.becomeHostTitle')}
                     </h2>
                     <p className="text-[var(--foreground-muted)] mb-4">
-                      Share your accommodations, attractions, or tours with travelers from around the world. 
-                      As a host, you can create listings and help visitors discover the beauty of Iraq.
+                      {t('dashboard.becomeHostDescription')}
                     </p>
                     <Button 
                       variant="secondary" 
                       onClick={handleBecomeHost}
                       isLoading={upgrading}
                     >
-                      Upgrade to Host Account
+                      {t('dashboard.upgradeToHost')}
                     </Button>
                   </div>
                 </div>
@@ -115,9 +116,9 @@ export function DashboardContent({ user, userRole: initialRole, showUpgrade }: D
                     </svg>
                   </div>
                   <div>
-                    <h3 className="font-bold text-[var(--foreground)]">Explore Listings</h3>
+                    <h3 className="font-bold text-[var(--foreground)]">{t('dashboard.exploreListings')}</h3>
                     <p className="text-sm text-[var(--foreground-muted)]">
-                      Discover accommodations, attractions & tours
+                      {t('dashboard.exploreListingsDescription')}
                     </p>
                   </div>
                 </CardContent>
@@ -134,9 +135,9 @@ export function DashboardContent({ user, userRole: initialRole, showUpgrade }: D
                       </svg>
                     </div>
                     <div>
-                      <h3 className="font-bold text-[var(--foreground)]">Host Dashboard</h3>
+                      <h3 className="font-bold text-[var(--foreground)]">{t('dashboard.hostDashboard')}</h3>
                       <p className="text-sm text-[var(--foreground-muted)]">
-                        Manage your listings
+                        {t('dashboard.manageListings')}
                       </p>
                     </div>
                   </CardContent>
@@ -154,9 +155,9 @@ export function DashboardContent({ user, userRole: initialRole, showUpgrade }: D
                       </svg>
                     </div>
                     <div>
-                      <h3 className="font-bold text-[var(--foreground)]">Admin Panel</h3>
+                      <h3 className="font-bold text-[var(--foreground)]">{t('dashboard.adminPanel')}</h3>
                       <p className="text-sm text-[var(--foreground-muted)]">
-                        Manage users and listings
+                        {t('dashboard.manageUsersListings')}
                       </p>
                     </div>
                   </CardContent>
@@ -173,9 +174,9 @@ export function DashboardContent({ user, userRole: initialRole, showUpgrade }: D
                     </svg>
                   </div>
                   <div>
-                    <h3 className="font-bold text-[var(--foreground)]">Profile Settings</h3>
+                    <h3 className="font-bold text-[var(--foreground)]">{t('dashboard.profileSettings')}</h3>
                     <p className="text-sm text-[var(--foreground-muted)]">
-                      Manage your account
+                      {t('dashboard.manageAccount')}
                     </p>
                   </div>
                 </CardContent>
@@ -185,12 +186,9 @@ export function DashboardContent({ user, userRole: initialRole, showUpgrade }: D
 
           {/* Info Section */}
           <div className="bg-white rounded-xl border border-[var(--border)] p-6">
-            <h2 className="font-bold text-[var(--foreground)] mb-4">About Visit Iraq</h2>
+            <h2 className="font-bold text-[var(--foreground)] mb-4">{t('dashboard.aboutVisitIraq')}</h2>
             <p className="text-[var(--foreground-muted)] leading-relaxed">
-              Visit Iraq is your gateway to discovering the rich heritage and modern wonders of Iraq. 
-              As a registered user, you have full access to contact information, pricing details, 
-              and booking options for all listings. Explore ancient Mesopotamian ruins, 
-              vibrant cities, and warm hospitality.
+              {t('dashboard.aboutDescription')}
             </p>
           </div>
         </div>

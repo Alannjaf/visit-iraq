@@ -1,5 +1,6 @@
 import { stackServerApp } from "@/stack";
 import { redirect } from "next/navigation";
+import { getTranslations } from 'next-intl/server';
 import { getListingsByHost, getUserRole } from "@/lib/db";
 import { Link } from '@/i18n/routing';
 import { Badge, Button } from "@/components/ui";
@@ -11,6 +12,7 @@ export default async function HostDashboard({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
+  const t = await getTranslations();
   const user = await stackServerApp.getUser();
   
   if (!user) {
@@ -32,9 +34,9 @@ export default async function HostDashboard({
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-[var(--foreground)]">My Listings</h1>
+          <h1 className="text-3xl font-bold text-[var(--foreground)]">{t('host.myListings')}</h1>
           <p className="text-[var(--foreground-muted)] mt-2">
-            Manage your accommodations, attractions, and tours
+            {t('host.manageListingsDescription')}
           </p>
         </div>
         <Link href="/host/new">
@@ -42,7 +44,7 @@ export default async function HostDashboard({
             <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
             </svg>
-            Add New Listing
+            {t('host.addNewListing')}
           </Button>
         </Link>
       </div>
@@ -58,7 +60,7 @@ export default async function HostDashboard({
             </div>
             <div>
               <p className="text-2xl font-bold text-[var(--foreground)]">{pendingCount}</p>
-              <p className="text-sm text-[var(--foreground-muted)]">Pending Review</p>
+              <p className="text-sm text-[var(--foreground-muted)]">{t('host.pendingReview')}</p>
             </div>
           </div>
         </div>
@@ -71,7 +73,7 @@ export default async function HostDashboard({
             </div>
             <div>
               <p className="text-2xl font-bold text-[var(--foreground)]">{approvedCount}</p>
-              <p className="text-sm text-[var(--foreground-muted)]">Live Listings</p>
+              <p className="text-sm text-[var(--foreground-muted)]">{t('host.liveListings')}</p>
             </div>
           </div>
         </div>
@@ -84,7 +86,7 @@ export default async function HostDashboard({
             </div>
             <div>
               <p className="text-2xl font-bold text-[var(--foreground)]">{rejectedCount}</p>
-              <p className="text-sm text-[var(--foreground-muted)]">Needs Changes</p>
+              <p className="text-sm text-[var(--foreground-muted)]">{t('host.needsChanges')}</p>
             </div>
           </div>
         </div>
@@ -98,12 +100,12 @@ export default async function HostDashboard({
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
             </svg>
           </div>
-          <h2 className="text-xl font-bold text-[var(--foreground)] mb-2">No listings yet</h2>
+          <h2 className="text-xl font-bold text-[var(--foreground)] mb-2">{t('host.noListingsYet')}</h2>
           <p className="text-[var(--foreground-muted)] mb-6">
-            Start by creating your first listing to share with travelers
+            {t('host.noListingsDescription')}
           </p>
           <Link href="/host/new">
-            <Button variant="primary">Create Your First Listing</Button>
+            <Button variant="primary">{t('host.createFirstListing')}</Button>
           </Link>
         </div>
       ) : (
@@ -128,11 +130,11 @@ export default async function HostDashboard({
                       {getListingTypeLabel(listing.type)} • {listing.city}, {listing.region}
                     </p>
                     <p className="text-sm text-[var(--foreground-muted)]">
-                      Created {formatDate(listing.created_at)}
+                      {t('host.created', { date: formatDate(listing.created_at) })}
                     </p>
                     {listing.status === "rejected" && listing.rejection_reason && (
                       <div className="mt-3 p-3 bg-red-50 border border-red-100 rounded-lg">
-                        <p className="text-sm font-medium text-red-800 mb-1">Rejection Reason:</p>
+                        <p className="text-sm font-medium text-red-800 mb-1">{t('host.rejectionReason')}</p>
                         <p className="text-sm text-red-700">{listing.rejection_reason}</p>
                       </div>
                     )}
@@ -140,12 +142,12 @@ export default async function HostDashboard({
                   <div className="flex gap-2">
                     <Link href={`/host/edit/${listing.id}`}>
                       <Button variant="outline" size="sm">
-                        Edit
+                        {t('host.edit')}
                       </Button>
                     </Link>
                     <Link href={`/listings/${listing.id}`}>
                       <Button variant="ghost" size="sm">
-                        View
+                        {t('host.view')}
                       </Button>
                     </Link>
                   </div>

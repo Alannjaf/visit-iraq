@@ -1,5 +1,6 @@
 import { stackServerApp } from "@/stack";
 import { redirect } from "next/navigation";
+import { getTranslations } from 'next-intl/server';
 import { getUserRole } from "@/lib/db";
 import { ListingForm } from "@/components/listings/ListingForm";
 import { Link } from '@/i18n/routing';
@@ -10,6 +11,7 @@ export default async function NewListingPage({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
+  const t = await getTranslations();
   const user = await stackServerApp.getUser();
   
   if (!user) {
@@ -28,11 +30,11 @@ export default async function NewListingPage({
           href="/host"
           className="text-[var(--foreground-muted)] hover:text-[var(--primary)] transition-colors"
         >
-          ← Back to My Listings
+          {t('host.backToListings')}
         </Link>
-        <h1 className="text-3xl font-bold text-[var(--foreground)] mt-4">Add New Listing</h1>
+        <h1 className="text-3xl font-bold text-[var(--foreground)] mt-4">{t('host.addNewListingTitle')}</h1>
         <p className="text-[var(--foreground-muted)] mt-2">
-          Fill in the details below. Your listing will be reviewed before going live.
+          {t('host.addNewListingDescription')}
         </p>
       </div>
 

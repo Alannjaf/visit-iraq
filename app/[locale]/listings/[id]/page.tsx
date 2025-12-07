@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/routing';
 import { getListingById, getUserRole } from "@/lib/db";
 import { Header, Footer } from "@/components/layout";
@@ -13,6 +14,7 @@ export default async function ListingDetailPage({
   params: Promise<{ locale: string; id: string }>;
 }) {
   const { locale, id } = await params;
+  const t = await getTranslations();
   const user = await stackServerApp.getUser();
   let userRole = null;
   if (user) {
@@ -45,7 +47,7 @@ export default async function ListingDetailPage({
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
             <nav className="flex items-center gap-2 text-sm">
               <Link href="/" className="text-[var(--foreground-muted)] hover:text-[var(--primary)]">
-                Home
+                {t('listing.home')}
               </Link>
               <span className="text-[var(--foreground-muted)]">/</span>
               <span className="text-[var(--foreground)]">{listing.title}</span>
@@ -68,7 +70,7 @@ export default async function ListingDetailPage({
               {/* Videos */}
               {listing.videos && listing.videos.length > 0 && (
                 <div className="bg-white rounded-xl border border-[var(--border)] p-6">
-                  <h2 className="text-xl font-bold text-[var(--foreground)] mb-4">Videos</h2>
+                  <h2 className="text-xl font-bold text-[var(--foreground)] mb-4">{t('listing.videos')}</h2>
                   <div className="space-y-4">
                     {listing.videos.map((videoUrl, index) => (
                       <div key={index} className="aspect-video bg-gray-100 rounded-lg overflow-hidden">
@@ -107,7 +109,7 @@ export default async function ListingDetailPage({
                   <span className="px-3 py-1 bg-[var(--primary)]/10 rounded-full text-sm font-medium text-[var(--primary)]">
                     {getListingTypeLabel(listing.type)}
                   </span>
-                  <Badge variant="approved">Live</Badge>
+                  <Badge variant="approved">{t('listing.live')}</Badge>
                 </div>
                 <h1 className="text-3xl font-display font-bold text-[var(--foreground)] mb-4">
                   {listing.title}
@@ -123,7 +125,7 @@ export default async function ListingDetailPage({
 
               {/* Description */}
               <div className="bg-white rounded-xl border border-[var(--border)] p-6">
-                <h2 className="text-xl font-bold text-[var(--foreground)] mb-4">About</h2>
+                <h2 className="text-xl font-bold text-[var(--foreground)] mb-4">{t('listing.about')}</h2>
                 <p className="text-[var(--foreground)] whitespace-pre-wrap leading-relaxed">
                   {listing.description}
                 </p>
@@ -133,7 +135,7 @@ export default async function ListingDetailPage({
               {listing.amenities && listing.amenities.length > 0 && (
                 <div className="bg-white rounded-xl border border-[var(--border)] p-6">
                   <h2 className="text-xl font-bold text-[var(--foreground)] mb-4">
-                    {listing.type === "accommodation" ? "Amenities" : "Features"}
+                    {listing.type === "accommodation" ? t('listing.amenities') : t('listing.features')}
                   </h2>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                     {listing.amenities.map((amenity, index) => (
@@ -157,7 +159,7 @@ export default async function ListingDetailPage({
                   <>
                     {/* Price */}
                     <div className="mb-6 pb-6 border-b border-[var(--border)]">
-                      <p className="text-sm text-[var(--foreground-muted)] mb-1">Price Range</p>
+                      <p className="text-sm text-[var(--foreground-muted)] mb-1">{t('listing.priceRange')}</p>
                       <p className="text-2xl font-bold text-[var(--primary)]">
                         {formatPriceRange(listing.price_range)}
                       </p>
@@ -165,7 +167,7 @@ export default async function ListingDetailPage({
 
                     {/* Contact Info */}
                     <div className="space-y-4 mb-6">
-                      <h3 className="font-bold text-[var(--foreground)]">Contact Information</h3>
+                      <h3 className="font-bold text-[var(--foreground)]">{t('listing.contactInformation')}</h3>
                       
                       {listing.contact_phone && (
                         <a
@@ -209,7 +211,7 @@ export default async function ListingDetailPage({
                         rel="noopener noreferrer"
                       >
                         <Button variant="primary" className="w-full">
-                          Visit Website
+                          {t('listing.visitWebsite')}
                           <svg className="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                           </svg>
@@ -226,19 +228,19 @@ export default async function ListingDetailPage({
                       </svg>
                     </div>
                     <h3 className="font-bold text-[var(--foreground)] mb-2">
-                      Sign Up to See Full Details
+                      {t('listing.signUpToSeeDetails')}
                     </h3>
                     <p className="text-sm text-[var(--foreground-muted)] mb-6">
-                      Create a free account to view contact information, pricing, and booking options.
+                      {t('listing.signUpDescription')}
                     </p>
                     <Link href={`/handler/sign-up?after_auth_return_to=/${locale}/listings/${id}`}>
                       <Button variant="primary" className="w-full mb-3">
-                        Sign Up Free
+                        {t('listing.signUpFree')}
                       </Button>
                     </Link>
                     <Link href={`/handler/sign-in?after_auth_return_to=/${locale}/listings/${id}`}>
                       <Button variant="outline" className="w-full">
-                        Already have an account? Sign In
+                        {t('listing.alreadyHaveAccount')}
                       </Button>
                     </Link>
                   </div>
@@ -247,22 +249,22 @@ export default async function ListingDetailPage({
 
               {/* Info Card */}
               <div className="bg-white rounded-xl border border-[var(--border)] p-6">
-                <h3 className="font-bold text-[var(--foreground)] mb-4">Listing Info</h3>
+                <h3 className="font-bold text-[var(--foreground)] mb-4">{t('listing.listingInfo')}</h3>
                 <div className="space-y-3 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-[var(--foreground-muted)]">Type</span>
+                    <span className="text-[var(--foreground-muted)]">{t('listing.type')}</span>
                     <span className="text-[var(--foreground)]">{getListingTypeLabel(listing.type)}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-[var(--foreground-muted)]">Region</span>
+                    <span className="text-[var(--foreground-muted)]">{t('listing.region')}</span>
                     <span className="text-[var(--foreground)]">{listing.region}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-[var(--foreground-muted)]">City</span>
+                    <span className="text-[var(--foreground-muted)]">{t('listing.city')}</span>
                     <span className="text-[var(--foreground)]">{listing.city}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-[var(--foreground-muted)]">Listed</span>
+                    <span className="text-[var(--foreground-muted)]">{t('listing.listed')}</span>
                     <span className="text-[var(--foreground)]">{formatDate(listing.created_at)}</span>
                   </div>
                 </div>
