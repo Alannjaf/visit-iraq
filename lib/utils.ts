@@ -41,6 +41,7 @@ export function capitalize(text: string): string {
 // Format price range display
 export function formatPriceRange(range: string): string {
   const ranges: Record<string, string> = {
+    free: '🆓 Free',
     budget: '$ Budget-friendly',
     moderate: '$$ Moderate',
     premium: '$$$ Premium',

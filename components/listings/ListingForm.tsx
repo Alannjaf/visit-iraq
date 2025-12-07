@@ -150,14 +150,51 @@ export function ListingForm({ listing, mode }: ListingFormProps) {
            videoDomains.some(domain => lowerUrl.includes(domain));
   };
 
+  const getVideoThumbnail = (videoUrl: string): string | null => {
+    // YouTube thumbnail
+    if (videoUrl.includes('youtube.com/watch') || videoUrl.includes('youtu.be/')) {
+      let videoId = '';
+      if (videoUrl.includes('youtube.com/watch')) {
+        videoId = videoUrl.split('v=')[1]?.split('&')[0] || '';
+      } else if (videoUrl.includes('youtu.be/')) {
+        videoId = videoUrl.split('youtu.be/')[1]?.split('?')[0] || '';
+      }
+      if (videoId) {
+        return `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg`;
+      }
+    }
+    
+    // Vimeo thumbnail (using vumbnail service)
+    if (videoUrl.includes('vimeo.com/')) {
+      const videoId = videoUrl.split('vimeo.com/')[1]?.split('?')[0] || '';
+      if (videoId) {
+        return `https://vumbnail.com/${videoId}.jpg`;
+      }
+    }
+    
+    // For direct video URLs, return null (will need to use video poster or first frame)
+    // For now, we'll use a placeholder or the video URL itself as a fallback
+    return null;
+  };
+
   const addMedia = () => {
     if (newMediaUrl.trim()) {
       const url = newMediaUrl.trim();
       if (isVideoUrl(url)) {
-        setFormData(prev => ({
-          ...prev,
-          videos: [...prev.videos, url],
-        }));
+        setFormData(prev => {
+          const newVideos = [...prev.videos, url];
+          // Auto-set first video thumbnail as thumbnail if no images exist and no thumbnail is set
+          const videoThumbnail = getVideoThumbnail(url);
+          const newThumbnail = prev.thumbnail || 
+            (prev.images.length === 0 && newVideos.length === 1 && videoThumbnail 
+              ? videoThumbnail 
+              : prev.thumbnail);
+          return {
+            ...prev,
+            videos: newVideos,
+            thumbnail: newThumbnail,
+          };
+        });
       } else {
         setFormData(prev => {
           const newImages = [...prev.images, url];
@@ -192,10 +229,30 @@ export function ListingForm({ listing, mode }: ListingFormProps) {
   };
 
   const removeVideo = (index: number) => {
-    setFormData(prev => ({
-      ...prev,
-      videos: prev.videos.filter((_, i) => i !== index),
-    }));
+    setFormData(prev => {
+      const videoToRemove = prev.videos[index];
+      const videoThumbnail = getVideoThumbnail(videoToRemove);
+      const newVideos = prev.videos.filter((_, i) => i !== index);
+      
+      // If the removed video's thumbnail was the current thumbnail, update it
+      let newThumbnail = prev.thumbnail;
+      if (prev.thumbnail === videoThumbnail) {
+        // If there are still videos, use the first video's thumbnail
+        // Otherwise, use first image if available, or null
+        if (newVideos.length > 0) {
+          const firstVideoThumbnail = getVideoThumbnail(newVideos[0]);
+          newThumbnail = firstVideoThumbnail || (prev.images.length > 0 ? prev.images[0] : null);
+        } else {
+          newThumbnail = prev.images.length > 0 ? prev.images[0] : null;
+        }
+      }
+      
+      return {
+        ...prev,
+        videos: newVideos,
+        thumbnail: newThumbnail,
+      };
+    });
   };
 
   const availableCities = formData.region 
@@ -431,43 +488,98 @@ export function ListingForm({ listing, mode }: ListingFormProps) {
           {formData.videos.length > 0 && (
             <div>
               <h3 className="text-sm font-medium text-[var(--foreground-muted)] mb-2">Videos</h3>
+              <p className="text-xs text-[var(--foreground-muted)] mb-4">
+                Click "Set as Thumbnail" to use a video thumbnail as the listing thumbnail.
+              </p>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {formData.videos.map((url, index) => (
-                  <div key={index} className="relative group">
-                    <div className="w-full aspect-video bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
-                      {url.includes('youtube.com') || url.includes('youtu.be') ? (
-                        <iframe
-                          src={url.includes('youtube.com/watch') 
-                            ? url.replace('watch?v=', 'embed/').split('&')[0]
-                            : url.replace('youtu.be/', 'youtube.com/embed/')}
-                          className="w-full h-full"
-                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                          allowFullScreen
-                        />
-                      ) : url.includes('vimeo.com') ? (
-                        <iframe
-                          src={`https://player.vimeo.com/video/${url.split('/').pop()}`}
-                          className="w-full h-full"
-                          allow="autoplay; fullscreen; picture-in-picture"
-                          allowFullScreen
-                        />
-                      ) : (
-                        <video
-                          src={url}
-                          className="w-full h-full object-cover"
-                          controls
-                        />
-                      )}
+                {formData.videos.map((url, index) => {
+                  const videoThumbnail = getVideoThumbnail(url);
+                  const isThumbnail = formData.thumbnail === videoThumbnail;
+                  
+                  return (
+                    <div key={index} className="relative group">
+                      <div className="w-full aspect-video bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden relative">
+                        {videoThumbnail ? (
+                          <>
+                            <img
+                              src={videoThumbnail}
+                              alt={`Video thumbnail ${index + 1}`}
+                              className={`w-full h-full object-cover border-2 transition-all ${
+                                isThumbnail
+                                  ? "border-primary ring-2 ring-primary ring-offset-2"
+                                  : "border-transparent"
+                              }`}
+                              onError={(e) => {
+                                // Fallback to iframe if thumbnail fails to load
+                                (e.target as HTMLImageElement).style.display = 'none';
+                              }}
+                            />
+                            {isThumbnail && (
+                              <div className="absolute top-2 left-2 bg-primary text-white text-xs px-2 py-1 rounded z-10">
+                                Thumbnail
+                              </div>
+                            )}
+                            <div className="absolute inset-0 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity bg-black/50 rounded-lg">
+                              <button
+                                type="button"
+                                onClick={() => setFormData(prev => ({ ...prev, thumbnail: videoThumbnail }))}
+                                className={`px-3 py-1 text-white text-xs rounded hover:bg-primary-light transition-colors ${
+                                  isThumbnail ? "bg-primary-light" : "bg-primary"
+                                }`}
+                              >
+                                {isThumbnail ? "Thumbnail Selected" : "Set as Thumbnail"}
+                              </button>
+                            </div>
+                          </>
+                        ) : (
+                          <>
+                            {url.includes('youtube.com') || url.includes('youtu.be') ? (
+                              <iframe
+                                src={url.includes('youtube.com/watch') 
+                                  ? url.replace('watch?v=', 'embed/').split('&')[0]
+                                  : url.replace('youtu.be/', 'youtube.com/embed/')}
+                                className="w-full h-full"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                allowFullScreen
+                              />
+                            ) : url.includes('vimeo.com') ? (
+                              <iframe
+                                src={`https://player.vimeo.com/video/${url.split('/').pop()}`}
+                                className="w-full h-full"
+                                allow="autoplay; fullscreen; picture-in-picture"
+                                allowFullScreen
+                              />
+                            ) : (
+                              <video
+                                src={url}
+                                className="w-full h-full object-cover"
+                                controls
+                              />
+                            )}
+                            {isThumbnail && (
+                              <div className="absolute top-2 left-2 bg-primary text-white text-xs px-2 py-1 rounded z-10">
+                                Thumbnail
+                              </div>
+                            )}
+                          </>
+                        )}
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          // If this video's thumbnail is the current thumbnail, clear it
+                          if (isThumbnail) {
+                            setFormData(prev => ({ ...prev, thumbnail: null }));
+                          }
+                          removeVideo(index);
+                        }}
+                        className="absolute top-2 right-2 w-6 h-6 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center z-10"
+                      >
+                        ×
+                      </button>
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => removeVideo(index)}
-                      className="absolute top-2 right-2 w-6 h-6 bg-red-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center"
-                    >
-                      ×
-                    </button>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           )}

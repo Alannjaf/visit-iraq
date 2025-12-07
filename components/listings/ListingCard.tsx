@@ -69,11 +69,15 @@ export function ListingCard({ listing, showStatus = false }: ListingCardProps) {
           {listing.price_range && (
             <div className="flex items-center gap-1 pt-1">
               <span className="font-semibold text-gray-900">
+                {listing.price_range === "free" && "🆓 Free"}
                 {listing.price_range === "budget" && "$"}
-                {listing.price_range === "mid-range" && "$$"}
-                {listing.price_range === "luxury" && "$$$"}
+                {listing.price_range === "moderate" && "$$"}
+                {listing.price_range === "premium" && "$$$"}
+                {listing.price_range === "luxury" && "$$$$"}
               </span>
-              <span className="text-sm text-gray-500">per night</span>
+              {listing.price_range !== "free" && (
+                <span className="text-sm text-gray-500">per night</span>
+              )}
             </div>
           )}
         </div>
