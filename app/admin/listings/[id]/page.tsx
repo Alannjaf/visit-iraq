@@ -439,8 +439,10 @@ export default function AdminListingDetailPage({
             </div>
             <div>
               <p className="text-sm text-[var(--foreground-muted)]">Host</p>
-              <p className="text-[var(--foreground)]">{hostDetails?.name || listing.host_id}</p>
-              {hostDetails?.email && (
+              <p className="text-[var(--foreground)]">
+                {hostDetails?.name || "Unknown Host"}
+              </p>
+              {hostDetails?.email && hostDetails.name !== hostDetails.email && (
                 <p className="text-sm text-[var(--foreground-muted)]">{hostDetails.email}</p>
               )}
             </div>

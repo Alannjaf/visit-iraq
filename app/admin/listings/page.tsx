@@ -33,9 +33,11 @@ export default async function AdminListingsPage({
   const listingsWithHostDetails = await Promise.all(
     listings.map(async (listing) => {
       const hostDetails = await getUserDetailsFromStack(listing.host_id);
+      // Prioritize displayName, then email, never show ID
+      const hostDisplayName = hostDetails?.displayName || hostDetails?.email || "Unknown Host";
       return {
         ...listing,
-        hostName: hostDetails?.displayName || hostDetails?.email || listing.host_id.slice(0, 8) + "...",
+        hostName: hostDisplayName,
         hostEmail: hostDetails?.email || null,
       };
     })

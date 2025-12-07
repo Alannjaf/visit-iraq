@@ -362,7 +362,7 @@ export async function getAllUsers(): Promise<Array<{ user_id: string; role: User
 }
 
 // Helper function to get user details from Stack Auth
-// First tries the sync table, then falls back to Stack Auth API
+// First tries the sync table, then falls back to user_roles table, then Stack Auth API
 export async function getUserDetailsFromStack(userId: string): Promise<{ email: string; displayName: string | null } | null> {
   try {
     // First, try neon_auth.users_sync table (Stack Auth sync table)
@@ -394,11 +394,37 @@ export async function getUserDetailsFromStack(userId: string): Promise<{ email: 
       };
     }
   } catch (error) {
-    // Table might not exist or have different structure - continue to API fallback
+    // Table might not exist or have different structure - continue to fallback
     console.error(`Error fetching user details from sync table for ${userId}:`, error);
   }
   
-  // Fallback: Use Stack Auth API to fetch user details
+  // Fallback: Try user_roles table which might have email and display_name
+  try {
+    const roleResult = await sql`
+      SELECT email, display_name
+      FROM user_roles
+      WHERE user_id = ${userId}
+      LIMIT 1
+    `;
+    
+    if (roleResult && Array.isArray(roleResult) && roleResult.length > 0) {
+      const user = roleResult[0] as { 
+        email: string | null; 
+        display_name: string | null;
+      };
+      
+      if (user.email) {
+        return {
+          email: user.email,
+          displayName: user.display_name || null,
+        };
+      }
+    }
+  } catch (error) {
+    console.error(`Error fetching user details from user_roles table for ${userId}:`, error);
+  }
+  
+  // Final fallback: Use Stack Auth API to fetch user details
   try {
     const { stackServerApp } = await import('@/stack');
     
