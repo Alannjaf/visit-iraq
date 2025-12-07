@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useUser, UserButton } from "@stackframe/stack";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
@@ -48,18 +49,14 @@ export function Header({ userRole }: HeaderProps) {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-lg bg-linear-to-br from-primary to-primary-light flex items-center justify-center">
-              <svg
-                className="w-6 h-6 text-secondary"
-                fill="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
-              </svg>
-            </div>
-            <span className="font-display text-xl font-bold text-primary">
-              Visit Iraq
-            </span>
+            <Image
+              src="/logo.svg"
+              alt="Visit Iraq"
+              width={234}
+              height={78}
+              className="h-[73px] w-auto"
+              priority
+            />
           </Link>
 
           {/* Auth Section */}
