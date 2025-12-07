@@ -15,6 +15,7 @@ export default function AdminListingDetailPage({
   const { id } = use(params);
   const router = useRouter();
   const [listing, setListing] = useState<Listing | null>(null);
+  const [hostDetails, setHostDetails] = useState<{ name: string; email: string | null } | null>(null);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
   const [rejectReason, setRejectReason] = useState("");
@@ -40,6 +41,35 @@ export default function AdminListingDetailPage({
       
       const data = await res.json();
       setListing(data.listing);
+      
+      // Fetch host details
+      if (data.listing?.host_id) {
+        try {
+          const hostRes = await fetch(`/api/admin/users/${data.listing.host_id}`, {
+            credentials: "include",
+          });
+          if (hostRes.ok) {
+            const hostData = await hostRes.json();
+            setHostDetails({
+              name: hostData.displayName || hostData.email || data.listing.host_id,
+              email: hostData.email || null,
+            });
+          } else {
+            // Fallback to host_id if API returns error
+            setHostDetails({
+              name: data.listing.host_id,
+              email: null,
+            });
+          }
+        } catch (error) {
+          console.error("Error fetching host details:", error);
+          // Fallback to host_id if fetch fails
+          setHostDetails({
+            name: data.listing.host_id,
+            email: null,
+          });
+        }
+      }
     } catch (error) {
       console.error("Error fetching listing:", error);
       // Show error to user
@@ -408,8 +438,11 @@ export default function AdminListingDetailPage({
               <p className="text-[var(--foreground)]">{formatDate(listing.created_at)}</p>
             </div>
             <div>
-              <p className="text-sm text-[var(--foreground-muted)]">Host ID</p>
-              <p className="text-[var(--foreground)] font-mono text-sm">{listing.host_id}</p>
+              <p className="text-sm text-[var(--foreground-muted)]">Host</p>
+              <p className="text-[var(--foreground)]">{hostDetails?.name || listing.host_id}</p>
+              {hostDetails?.email && (
+                <p className="text-sm text-[var(--foreground-muted)]">{hostDetails.email}</p>
+              )}
             </div>
           </div>
         </div>

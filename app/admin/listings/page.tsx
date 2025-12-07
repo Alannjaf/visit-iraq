@@ -1,7 +1,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { getAllListings } from "@/lib/db";
+import { getAllListings, getUserDetailsFromStack } from "@/lib/db";
 import { Badge } from "@/components/ui";
 import { formatDate, getListingTypeLabel, getListingTypeEmoji } from "@/lib/utils";
 
@@ -28,6 +28,18 @@ export default async function AdminListingsPage({
   if (params.type) {
     listings = listings.filter(l => l.type === params.type);
   }
+
+  // Fetch host details for all listings
+  const listingsWithHostDetails = await Promise.all(
+    listings.map(async (listing) => {
+      const hostDetails = await getUserDetailsFromStack(listing.host_id);
+      return {
+        ...listing,
+        hostName: hostDetails?.displayName || hostDetails?.email || listing.host_id.slice(0, 8) + "...",
+        hostEmail: hostDetails?.email || null,
+      };
+    })
+  );
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -135,7 +147,7 @@ export default async function AdminListingsPage({
 
       {/* Listings Table */}
       <div className="bg-white rounded-xl border border-[var(--border)] overflow-hidden">
-        {listings.length === 0 ? (
+        {listingsWithHostDetails.length === 0 ? (
           <div className="p-12 text-center">
             <div className="w-16 h-16 rounded-full bg-[var(--background-alt)] flex items-center justify-center mx-auto mb-4">
               <svg className="w-8 h-8 text-[var(--foreground-muted)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -169,7 +181,7 @@ export default async function AdminListingsPage({
               </tr>
             </thead>
             <tbody className="divide-y divide-[var(--border)]">
-              {listings.map((listing) => (
+              {listingsWithHostDetails.map((listing) => (
                 <tr key={listing.id} className="hover:bg-[var(--background-alt)] transition-colors">
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
@@ -179,7 +191,7 @@ export default async function AdminListingsPage({
                       <div>
                         <p className="font-medium text-[var(--foreground)]">{listing.title}</p>
                         <p className="text-sm text-[var(--foreground-muted)]">
-                          Host: {listing.host_id.slice(0, 8)}...
+                          Host: {listing.hostName}
                         </p>
                       </div>
                     </div>
