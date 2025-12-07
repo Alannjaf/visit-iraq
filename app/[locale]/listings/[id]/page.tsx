@@ -245,16 +245,16 @@ export default async function ListingDetailPage({
                     <p className="text-sm text-[var(--foreground-muted)] mb-6">
                       {t('listing.signUpDescription')}
                     </p>
-                    <Link href={`/handler/sign-up?after_auth_return_to=/${locale}/listings/${id}`}>
+                    <a href={`/handler/sign-up?after_auth_return_to=/${locale}/listings/${id}`}>
                       <Button variant="primary" className="w-full mb-3">
                         {t('listing.signUpFree')}
                       </Button>
-                    </Link>
-                    <Link href={`/handler/sign-in?after_auth_return_to=/${locale}/listings/${id}`}>
+                    </a>
+                    <a href={`/handler/sign-in?after_auth_return_to=/${locale}/listings/${id}`}>
                       <Button variant="outline" className="w-full">
                         {t('listing.alreadyHaveAccount')}
                       </Button>
-                    </Link>
+                    </a>
                   </div>
                 )}
               </div>

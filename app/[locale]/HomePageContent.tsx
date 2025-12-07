@@ -160,11 +160,11 @@ export function HomePageContent({
               {t('home.noListingsAvailableDescription')}
             </p>
             {!hasUser && (
-              <Link href="/handler/sign-up">
+              <a href="/handler/sign-up">
                 <Button variant="primary" size="lg">
                   {t('common.becomeHost')}
                 </Button>
-              </Link>
+              </a>
             )}
           </div>
         </section>

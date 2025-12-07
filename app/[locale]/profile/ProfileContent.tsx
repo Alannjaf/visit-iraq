@@ -104,9 +104,9 @@ export function ProfileContent({ user, userRole }: ProfileContentProps) {
               </p>
               <div className="flex gap-4">
                 <UserButton />
-                <Link href="/handler/sign-out">
+                <a href="/handler/sign-out">
                   <Button variant="outline">{t('profile.signOut')}</Button>
-                </Link>
+                </a>
               </div>
             </CardContent>
           </Card>
