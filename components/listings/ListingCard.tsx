@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from '@/i18n/routing';
 import { Badge } from "@/components/ui";
 import { getListingTypeLabel, truncate } from "@/lib/utils";
 import type { Listing } from "@/lib/db";

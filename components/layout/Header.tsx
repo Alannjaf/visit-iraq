@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from '@/i18n/routing';
 import Image from "next/image";
 import { useUser, UserButton } from "@stackframe/stack";
 import { Button } from "@/components/ui/Button";
