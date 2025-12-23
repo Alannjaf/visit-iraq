@@ -3,7 +3,12 @@ import { Header } from "@/components/layout/Header";
 import { getUserRole } from "@/lib/db";
 import { stackServerApp } from "@/stack";
 
-export default async function TermsOfServicePage() {
+export default async function TermsOfServicePage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
   const user = await stackServerApp.getUser();
   const userRole = user ? await getUserRole(user.id) : null;
 
