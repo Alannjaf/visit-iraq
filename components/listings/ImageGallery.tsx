@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { SafeImage } from "./SafeImage";
 
 interface ImageGalleryProps {
@@ -12,10 +13,15 @@ interface ImageGalleryProps {
 
 export function ImageGallery({ images, title, defaultImage, fallbackSrc }: ImageGalleryProps) {
   const [selectedImage, setSelectedImage] = useState(defaultImage);
+  const [thumbnailErrors, setThumbnailErrors] = useState<Set<string>>(new Set());
 
   // Combine all images - main image first, then the rest, ensuring no duplicates
   const imageSet = new Set([defaultImage, ...images]);
   const allImages = Array.from(imageSet);
+
+  const handleThumbnailError = (img: string) => {
+    setThumbnailErrors((prev) => new Set(prev).add(img));
+  };
 
   return (
     <div className="bg-white rounded-xl border border-[var(--border)] overflow-hidden">
@@ -24,8 +30,11 @@ export function ImageGallery({ images, title, defaultImage, fallbackSrc }: Image
         <SafeImage
           src={selectedImage}
           alt={title}
-          className="w-full h-full object-cover"
+          className="object-cover"
           fallbackSrc={fallbackSrc}
+          fill
+          priority
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 66vw, 800px"
         />
       </div>
       
@@ -36,20 +45,22 @@ export function ImageGallery({ images, title, defaultImage, fallbackSrc }: Image
             <button
               key={img}
               onClick={() => setSelectedImage(img)}
-              className={`flex-shrink-0 rounded-lg overflow-hidden border-2 transition-all ${
+              className={`flex-shrink-0 rounded-lg overflow-hidden border-2 transition-all relative ${
                 selectedImage === img
                   ? "border-[var(--primary)] ring-2 ring-[var(--primary)]/20"
                   : "border-transparent hover:border-[var(--border)]"
               }`}
             >
-              <img
-                src={img}
-                alt={`${title} thumbnail`}
-                className="w-24 h-16 object-cover"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src = fallbackSrc;
-                }}
-              />
+              <div className="relative w-24 h-16">
+                <Image
+                  src={thumbnailErrors.has(img) ? fallbackSrc : img}
+                  alt={`${title} thumbnail`}
+                  fill
+                  className="object-cover"
+                  sizes="96px"
+                  onError={() => handleThumbnailError(img)}
+                />
+              </div>
             </button>
           ))}
         </div>

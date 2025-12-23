@@ -6,6 +6,9 @@ import { SearchBar } from "@/components/SearchBar";
 import { CityFilter } from "@/components/CityFilter";
 import { HomePageContent } from "./HomePageContent";
 
+// Revalidate every 60 seconds for ISR caching
+export const revalidate = 60;
+
 export default async function HomePage({
   searchParams,
 }: {

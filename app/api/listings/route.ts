@@ -23,7 +23,14 @@ export async function GET(request: NextRequest) {
         const role = await getUserRole(user.id);
         if (role === "admin") {
           const listings = await getAllListings();
-          return NextResponse.json({ listings });
+          return NextResponse.json(
+            { listings },
+            {
+              headers: {
+                'Cache-Control': 'private, s-maxage=30, stale-while-revalidate=60'
+              }
+            }
+          );
         }
       }
     }
@@ -33,7 +40,14 @@ export async function GET(request: NextRequest) {
       type || undefined,
       city || undefined
     );
-    return NextResponse.json({ listings });
+    return NextResponse.json(
+      { listings },
+      {
+        headers: {
+          'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300'
+        }
+      }
+    );
   } catch (error) {
     console.error("Error fetching listings:", error);
     return NextResponse.json(

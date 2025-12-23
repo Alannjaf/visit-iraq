@@ -51,7 +51,14 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       }
       if (adminSession) {
         // Admin can see any listing
-        return NextResponse.json({ listing, isAuthenticated: true });
+        return NextResponse.json(
+          { listing, isAuthenticated: true },
+          {
+            headers: {
+              'Cache-Control': 'private, s-maxage=30, stale-while-revalidate=60'
+            }
+          }
+        );
       }
       const role = await getUserRole(user!.id);
       if (listing.host_id !== user!.id && role !== "admin") {
@@ -64,7 +71,14 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
     // Return full or partial listing based on auth status
     if (isAuthenticated) {
-      return NextResponse.json({ listing, isAuthenticated: true });
+      return NextResponse.json(
+        { listing, isAuthenticated: true },
+        {
+          headers: {
+            'Cache-Control': 'private, s-maxage=60, stale-while-revalidate=300'
+          }
+        }
+      );
     } else {
       // Hide sensitive info for guests
       const publicListing: Partial<Listing> = {
@@ -81,7 +95,14 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         status: listing.status,
         created_at: listing.created_at,
       };
-      return NextResponse.json({ listing: publicListing, isAuthenticated: false });
+      return NextResponse.json(
+        { listing: publicListing, isAuthenticated: false },
+        {
+          headers: {
+            'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600'
+          }
+        }
+      );
     }
   } catch (error) {
     console.error("Error fetching listing:", error);

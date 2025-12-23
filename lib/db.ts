@@ -204,99 +204,43 @@ export async function getApprovedListings(
   city?: string,
   searchQuery?: string
 ): Promise<Listing[]> {
-  if (type && city && searchQuery) {
-    const searchPattern = `%${searchQuery}%`;
-    const result = await sql`
-      SELECT * FROM listings 
-      WHERE status = 'approved' 
-        AND type = ${type} 
-        AND city = ${city}
-        AND (
-          title ILIKE ${searchPattern} OR
-          description ILIKE ${searchPattern} OR
-          city ILIKE ${searchPattern} OR
-          region ILIKE ${searchPattern} OR
-          location ILIKE ${searchPattern}
-        )
-      ORDER BY created_at DESC
-    `;
-    return result as Listing[];
-  } else if (type && city) {
-    const result = await sql`
-      SELECT * FROM listings 
-      WHERE status = 'approved' AND type = ${type} AND city = ${city}
-      ORDER BY created_at DESC
-    `;
-    return result as Listing[];
-  } else if (type && searchQuery) {
-    const searchPattern = `%${searchQuery}%`;
-    const result = await sql`
-      SELECT * FROM listings 
-      WHERE status = 'approved' 
-        AND type = ${type}
-        AND (
-          title ILIKE ${searchPattern} OR
-          description ILIKE ${searchPattern} OR
-          city ILIKE ${searchPattern} OR
-          region ILIKE ${searchPattern} OR
-          location ILIKE ${searchPattern}
-        )
-      ORDER BY created_at DESC
-    `;
-    return result as Listing[];
-  } else if (city && searchQuery) {
-    const searchPattern = `%${searchQuery}%`;
-    const result = await sql`
-      SELECT * FROM listings 
-      WHERE status = 'approved' 
-        AND city = ${city}
-        AND (
-          title ILIKE ${searchPattern} OR
-          description ILIKE ${searchPattern} OR
-          city ILIKE ${searchPattern} OR
-          region ILIKE ${searchPattern} OR
-          location ILIKE ${searchPattern}
-        )
-      ORDER BY created_at DESC
-    `;
-    return result as Listing[];
-  } else if (type) {
-    const result = await sql`
-      SELECT * FROM listings 
-      WHERE status = 'approved' AND type = ${type}
-      ORDER BY created_at DESC
-    `;
-    return result as Listing[];
-  } else if (city) {
-    const result = await sql`
-      SELECT * FROM listings 
-      WHERE status = 'approved' AND city = ${city}
-      ORDER BY created_at DESC
-    `;
-    return result as Listing[];
-  } else if (searchQuery) {
-    const searchPattern = `%${searchQuery}%`;
-    const result = await sql`
-      SELECT * FROM listings 
-      WHERE status = 'approved' 
-        AND (
-          title ILIKE ${searchPattern} OR
-          description ILIKE ${searchPattern} OR
-          city ILIKE ${searchPattern} OR
-          region ILIKE ${searchPattern} OR
-          location ILIKE ${searchPattern}
-        )
-      ORDER BY created_at DESC
-    `;
-    return result as Listing[];
-  } else {
-    const result = await sql`
-      SELECT * FROM listings 
-      WHERE status = 'approved'
-      ORDER BY created_at DESC
-    `;
-    return result as Listing[];
+  // Build query conditions dynamically
+  const conditions: any[] = [sql`status = 'approved'`];
+  
+  if (type) {
+    conditions.push(sql`type = ${type}`);
   }
+  
+  if (city) {
+    conditions.push(sql`city = ${city}`);
+  }
+  
+  if (searchQuery) {
+    const searchPattern = `%${searchQuery}%`;
+    conditions.push(sql`(
+      title ILIKE ${searchPattern} OR
+      description ILIKE ${searchPattern} OR
+      city ILIKE ${searchPattern} OR
+      region ILIKE ${searchPattern} OR
+      location ILIKE ${searchPattern}
+    )`);
+  }
+  
+  // Combine all conditions with AND
+  const whereClause = conditions.reduce((acc, condition, index) => {
+    if (index === 0) return condition;
+    return sql`${acc} AND ${condition}`;
+  });
+  
+  // Execute single query with LIMIT to prevent loading too many records
+  const result = await sql`
+    SELECT * FROM listings 
+    WHERE ${whereClause}
+    ORDER BY created_at DESC
+    LIMIT 100
+  `;
+  
+  return result as Listing[];
 }
 
 export async function getPendingListings(): Promise<Listing[]> {
@@ -354,11 +298,41 @@ export async function rejectListing(id: string, adminId: string, reason: string)
 
 // Get all users with their roles
 export async function getAllUsers(): Promise<Array<{ user_id: string; role: UserRole; is_suspended: boolean; created_at: Date; email: string | null; display_name: string | null }>> {
-  const result = await sql`
-    SELECT user_id, role, is_suspended, created_at, email, display_name FROM user_roles
-    ORDER BY created_at DESC
-  `;
-  return result as Array<{ user_id: string; role: UserRole; is_suspended: boolean; created_at: Date; email: string | null; display_name: string | null }>;
+  try {
+    // Try to JOIN with sync table first for better performance
+    const result = await sql`
+      SELECT 
+        ur.user_id,
+        ur.role,
+        ur.is_suspended,
+        ur.created_at,
+        COALESCE(
+          us.raw_json->>'primaryEmail',
+          us.raw_json->>'primary_email',
+          us.email,
+          ur.email,
+          'No email'
+        ) as email,
+        COALESCE(
+          us.raw_json->>'displayName',
+          us.raw_json->>'display_name',
+          us.name,
+          ur.display_name
+        ) as display_name
+      FROM user_roles ur
+      LEFT JOIN neon_auth.users_sync us ON ur.user_id = us.id AND us.deleted_at IS NULL
+      ORDER BY ur.created_at DESC
+    `;
+    return result as Array<{ user_id: string; role: UserRole; is_suspended: boolean; created_at: Date; email: string | null; display_name: string | null }>;
+  } catch (error) {
+    // Fallback if sync table doesn't exist or JOIN fails
+    console.error("Error in getAllUsers with JOIN, falling back:", error);
+    const result = await sql`
+      SELECT user_id, role, is_suspended, created_at, email, display_name FROM user_roles
+      ORDER BY created_at DESC
+    `;
+    return result as Array<{ user_id: string; role: UserRole; is_suspended: boolean; created_at: Date; email: string | null; display_name: string | null }>;
+  }
 }
 
 // Helper function to get user details from Stack Auth
@@ -440,11 +414,42 @@ export async function getUserDetailsFromStack(userId: string): Promise<{ email: 
 
 // Get users by role
 export async function getUsersByRole(role: UserRole): Promise<Array<{ user_id: string; role: UserRole; is_suspended: boolean; created_at: Date; email: string | null; display_name: string | null }>> {
-  const result = await sql`
-    SELECT user_id, role, is_suspended, created_at, email, display_name FROM user_roles
-    WHERE role = ${role}
-    ORDER BY created_at DESC
-  `;
-  return result as Array<{ user_id: string; role: UserRole; is_suspended: boolean; created_at: Date; email: string | null; display_name: string | null }>;
+  try {
+    // Try to JOIN with sync table first for better performance
+    const result = await sql`
+      SELECT 
+        ur.user_id,
+        ur.role,
+        ur.is_suspended,
+        ur.created_at,
+        COALESCE(
+          us.raw_json->>'primaryEmail',
+          us.raw_json->>'primary_email',
+          us.email,
+          ur.email,
+          'No email'
+        ) as email,
+        COALESCE(
+          us.raw_json->>'displayName',
+          us.raw_json->>'display_name',
+          us.name,
+          ur.display_name
+        ) as display_name
+      FROM user_roles ur
+      LEFT JOIN neon_auth.users_sync us ON ur.user_id = us.id AND us.deleted_at IS NULL
+      WHERE ur.role = ${role}
+      ORDER BY ur.created_at DESC
+    `;
+    return result as Array<{ user_id: string; role: UserRole; is_suspended: boolean; created_at: Date; email: string | null; display_name: string | null }>;
+  } catch (error) {
+    // Fallback if sync table doesn't exist or JOIN fails
+    console.error("Error in getUsersByRole with JOIN, falling back:", error);
+    const result = await sql`
+      SELECT user_id, role, is_suspended, created_at, email, display_name FROM user_roles
+      WHERE role = ${role}
+      ORDER BY created_at DESC
+    `;
+    return result as Array<{ user_id: string; role: UserRole; is_suspended: boolean; created_at: Date; email: string | null; display_name: string | null }>;
+  }
 }
 

@@ -8,6 +8,9 @@ import { stackServerApp } from "@/stack";
 import { getListingTypeLabel, formatPriceRange, formatDate } from "@/lib/utils";
 import { ImageGallery } from "@/components/listings/ImageGallery";
 
+// Revalidate every 300 seconds (5 minutes) for listing detail pages
+export const revalidate = 300;
+
 export default async function ListingDetailPage({
   params,
 }: {

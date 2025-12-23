@@ -43,37 +43,45 @@ export async function GET(request: NextRequest) {
       ? await getUsersByRole(roleFilter)
       : await getAllUsers();
 
-    // Fetch user details - user_roles now has email/display_name, but we'll enhance with sync table data if available
+    // getAllUsers and getUsersByRole now JOIN with sync table, so data is already fetched
+    // Only need to update user_roles if sync table has better data and user_roles is missing it
     const usersWithDetails = await Promise.all(
       userRoles.map(async (userRole) => {
-        // userRole already has email and display_name from the query
-        // But let's try to enhance it with sync table data if user_roles data is missing
-        let email = userRole.email || "No email";
-        let displayName = userRole.display_name || null;
+        // Data is already fetched from JOIN, but update user_roles if sync table had better data
+        // This ensures future queries don't need the JOIN
+        if (userRole.email && userRole.email !== "No email" && userRole.display_name) {
+          // Data is already good, no need to update
+          return {
+            ...userRole,
+            email: userRole.email,
+            displayName: userRole.display_name,
+          };
+        }
         
-        // If we don't have email/display_name in user_roles, try sync table
-        if (!userRole.email || !userRole.display_name) {
+        // If data is still missing, try Stack API as last resort (should be rare now)
+        if (!userRole.email || userRole.email === "No email" || !userRole.display_name) {
           const userDetails = await getUserDetailsFromStack(userRole.user_id);
           if (userDetails) {
-            email = userDetails.email || email;
-            displayName = userDetails.displayName || displayName;
-            
-            // Update user_roles with the found data for future use
-            if (userDetails.email || userDetails.displayName) {
-              try {
-                const { setUserRole } = await import('@/lib/db');
-                await setUserRole(userRole.user_id, userRole.role, userDetails.email || null, userDetails.displayName || null);
-              } catch (error) {
-                // Silently fail - will update on next check
-              }
+            // Update user_roles for future queries
+            try {
+              const { setUserRole } = await import('@/lib/db');
+              await setUserRole(userRole.user_id, userRole.role, userDetails.email || null, userDetails.displayName || null);
+            } catch (error) {
+              // Silently fail - will update on next check
             }
+            
+            return {
+              ...userRole,
+              email: userDetails.email || userRole.email || "No email",
+              displayName: userDetails.displayName || userRole.display_name || null,
+            };
           }
         }
         
         return {
           ...userRole,
-          email,
-          displayName,
+          email: userRole.email || "No email",
+          displayName: userRole.display_name || null,
         };
       })
     );

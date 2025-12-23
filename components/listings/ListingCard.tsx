@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+import Image from "next/image";
 import { Link } from '@/i18n/routing';
 import { Badge } from "@/components/ui";
 import { getListingTypeLabel, truncate } from "@/lib/utils";
@@ -11,6 +13,8 @@ interface ListingCardProps {
 }
 
 export function ListingCard({ listing, showStatus = false }: ListingCardProps) {
+  const [imageError, setImageError] = useState(false);
+  
   const defaultImages: Record<string, string> = {
     accommodation: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=400&h=300&fit=crop",
     attraction: "https://images.unsplash.com/photo-1539650116574-8efeb43e2750?w=400&h=300&fit=crop",
@@ -31,22 +35,28 @@ export function ListingCard({ listing, showStatus = false }: ListingCardProps) {
 
   // Use thumbnail if available, otherwise fall back to first image or default
   const imageUrl = listing.thumbnail || listing.images?.[0] || defaultImages[listing.type] || defaultImages.accommodation;
+  const fallbackUrl = defaultImages[listing.type] || defaultImages.accommodation;
 
   return (
     <Link href={`/listings/${listing.id}`} className="block">
       <article className="group cursor-pointer">
         {/* Image */}
         <div className="relative aspect-square overflow-hidden rounded-xl mb-3">
-          <img
-            src={imageUrl}
+          <Image
+            src={imageError ? fallbackUrl : imageUrl}
             alt={listing.title}
-            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-            onError={(e) => {
-              (e.target as HTMLImageElement).src = defaultImages[listing.type] || defaultImages.accommodation;
+            fill
+            className="object-cover transition-transform duration-300 group-hover:scale-105"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
+            priority={false}
+            onError={() => {
+              if (!imageError) {
+                setImageError(true);
+              }
             }}
           />
           {showStatus && (
-            <div className="absolute top-3 right-3">
+            <div className="absolute top-3 right-3 z-10">
               <Badge variant={listing.status as "pending" | "approved" | "rejected"}>
                 {listing.status}
               </Badge>

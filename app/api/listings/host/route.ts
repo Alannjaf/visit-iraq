@@ -22,7 +22,14 @@ export async function GET() {
     }
 
     const listings = await getListingsByHost(user.id);
-    return NextResponse.json({ listings });
+    return NextResponse.json(
+      { listings },
+      {
+        headers: {
+          'Cache-Control': 'private, s-maxage=30, stale-while-revalidate=60'
+        }
+      }
+    );
   } catch (error) {
     console.error("Error fetching host listings:", error);
     return NextResponse.json(
